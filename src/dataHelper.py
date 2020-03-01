@@ -6,6 +6,9 @@ class DataHelper:
     Klasa z funkcjami do obslugi plikow, danych
     """
 
+    def __init__(self):
+        pass
+
     @staticmethod
     def load_lyrics(genre):
         """
@@ -16,12 +19,12 @@ class DataHelper:
             genre (string): Gatunek muzyki.
 
         Returns:
-            genre_set (list): Lista tekstow utworow.
+            lyrics_list (list): Lista tekstow utworow.
         """
 
         lyrics_df = pd.read_csv('../res/lyrics.csv')
-        genre_set = []
+        lyrics_list = []
         for text, genre_value in zip(lyrics_df['lyrics'], lyrics_df['genre']):
             if genre_value == genre:
-                genre_set.append(str(text).lower())
-        return genre_set
+                lyrics_list.append(str(text).lower())
+        return lyrics_list
