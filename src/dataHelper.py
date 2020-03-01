@@ -27,4 +27,4 @@ class DataHelper:
         for text, genre_value in zip(lyrics_df['lyrics'], lyrics_df['genre']):
             if genre_value == genre:
                 lyrics_list.append(str(text).lower())
-        return lyrics_list 
+        return lyrics_list
