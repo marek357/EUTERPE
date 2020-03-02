@@ -1,1 +1,3 @@
+keras
+numpy
 pandas

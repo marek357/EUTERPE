@@ -1,2 +1,3 @@
 res/lyrics.csv
 .idea/*
+__pycache__
