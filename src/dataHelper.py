@@ -1,6 +1,9 @@
 from typing import Tuple, List, Dict
 import re
 import pandas as pd
+import numpy as np
+import json
+from keras.utils import np_utils
 
 
 class DataHelper:
@@ -37,7 +40,7 @@ class DataHelper:
             if genre_value == genre:
                 lyrics_list.append(
                     re.sub(
-                        r"[^0-9a-z.,' ]+",
+                        r'[^0-9a-z.,\' ]+',
                         '',
                         str(text).lower()
                     )
@@ -66,8 +69,8 @@ class DataHelper:
             i odpowiadajacych im liczb
 
         Returns:
-            X (list of list): Ciagi znakow do ktorych y jest uzupelnieniem.
-            y (list): Przewidywania.
+            x_list (list of list): Ciagi znakow do ktorych y jest uzupelnieniem.
+            y_list (list): Przewidywania.
         """
 
         dlugosc_wzorca = 100
@@ -83,8 +86,71 @@ class DataHelper:
         return x_list, y_list
 
     @staticmethod
-    def save_data(x_list: List[List[int]], y_list: List[int], path: str) -> None:
-        with open(path + 'x_list.json') as file:
+    def convert_to_numpy(x_list: List[List[int]], y_list: List[int],
+                         dlugosc: int, char_to_int_len: int) \
+            -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Funkcja konwertujaca Pythonowe listy do NumPy'owych arrayow
+        ktore mozna bedzie feedowac do LSTMu
+
+        Parameters:
+            x_list (list of list): Ciagi znakow
+            do ktorych y jest uzupelnieniem.
+            y_list (list): Przewidywania.
+            dlugosc (int): dlugosc wzorca
+            char_to_int_len (int): ilosc roznych
+            znakow w tekstach utworow
+
+        Returns:
+            x (np.ndarray): przekonwertowane x_list
+            y (np.ndarray): przekonwertowane y_list
+        """
+
+        x = np.reshape(x_list, (len(x_list), dlugosc, 1))
+        x /= float(char_to_int_len)
+        y = np_utils.to_categorical(y_list)
+        return x, y
+
+    @staticmethod
+    def save_data(x_list: List[List[int]], y_list: List[int],
+                  path: str) -> None:
+        """
+        Funkcja zachowujaca listy do plikow, zeby na wypadek
+        ponownego trenowania modelu nie trzeba bylo ponownie
+        encodowac tekstow piosenek.
+
+        Parameters:
+            x_list (list of list): lista x
+            y_list (list): lista y
+            path (str): sciezka do zapisu
+
+        Returns:
+            None
+        """
+
+        with open(path + 'x_list.json', 'w+') as file:
             file.write(str(x_list))
-        with open(path + 'y_list.json') as file:
+        with open(path + 'y_list.json', 'w+') as file:
             file.write(str(y_list))
+        return
+
+    @staticmethod
+    def load_data(path: str) -> Tuple[List[List[int]], List[int]]:
+        """
+        Funkcja ladujaca listy z plikow, zeby na wypadek
+        ponownego trenowania modelu nie trzeba bylo ponownie
+        encodowac tekstow piosenek.
+
+        Parameters:
+            path (str): sciezka do plikow
+
+        Returns:
+            x_list (list of list): lista x
+            y_list (list): lista y
+        """
+
+        with open(path + 'x_list.json', 'r') as x_file:
+            x_list = json.loads(x_file.read())
+        with open(path + 'y_list.json', 'r') as y_file:
+            y_list = json.loads(y_file.read())
+        return x_list, y_list
