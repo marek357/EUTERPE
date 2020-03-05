@@ -34,7 +34,6 @@ class DataHelper:
         lyrics_df = pd.read_csv('res/lyrics.csv')
         lyrics_list = []
         char_to_int = {}
-        dlugosc = 0
         char_set = set()
         for text, genre_value in zip(lyrics_df['lyrics'], lyrics_df['genre']):
             if genre_value == genre:
@@ -45,7 +44,6 @@ class DataHelper:
                         str(text).lower()
                     )
                 )
-                dlugosc += len(lyrics_list[-1])
                 char_set.update(set(str(text)))
         for index, elem in enumerate(sorted(list(char_set))):
             char_to_int[elem] = index
@@ -87,7 +85,7 @@ class DataHelper:
 
     @staticmethod
     def convert_to_numpy(x_list: List[List[int]], y_list: List[int],
-                         dlugosc: int, char_to_int_len: int) \
+                         length: int, char_to_int_len: int) \
             -> Tuple[np.ndarray, np.ndarray]:
         """
         Funkcja konwertujaca Pythonowe listy do NumPy'owych arrayow
@@ -97,7 +95,7 @@ class DataHelper:
             x_list (list of list): Ciagi znakow
             do ktorych y jest uzupelnieniem.
             y_list (list): Przewidywania.
-            dlugosc (int): dlugosc wzorca
+            length (int): dlugosc wzorca
             char_to_int_len (int): ilosc roznych
             znakow w tekstach utworow
 
@@ -106,7 +104,7 @@ class DataHelper:
             y (np.ndarray): przekonwertowane y_list
         """
 
-        x = np.reshape(x_list, (len(x_list), dlugosc, 1))
+        x = np.reshape(x_list, (len(x_list), length, 1))
         x /= float(char_to_int_len)
         y = np_utils.to_categorical(y_list)
         return x, y
@@ -128,10 +126,10 @@ class DataHelper:
             None
         """
 
-        with open(path + 'x_list.json', 'w+') as file:
-            file.write(str(x_list))
-        with open(path + 'y_list.json', 'w+') as file:
-            file.write(str(y_list))
+        with open(path + 'x_list.json', 'w+') as x_file:
+            x_file.write(str(x_list))
+        with open(path + 'y_list.json', 'w+') as y_file:
+            y_file.write(str(y_list))
         return
 
     @staticmethod
