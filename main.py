@@ -24,8 +24,8 @@ if __name__ == '__main__':
         print('done3')
         x, y = convert_to_numpy(x_list, y_list, 100, float(len(char_to_int)))
         print('done4')
-        character_model(x, y)
-        # generate(x, y, int_to_char)
+        # character_model(x, y)
+        generate(x, y, int_to_char, x_list[0])
         print('done5')
     else:
         x, y, char_to_int = load_data('/Users/marekmasiak/Desktop/')
