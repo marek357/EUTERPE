@@ -30,11 +30,7 @@ def load_lyrics(genre: str) -> Tuple[List[str], Dict[str, int]]:
     lyrics_list = []
     char_to_int = {}
     char_set = set()
-    finish = 0
     for text, genre_value in zip(lyrics_df['lyrics'], lyrics_df['genre']):
-        if finish > 5000:
-            break
-        finish += 1
         if genre_value == genre:
             lyrics_list.append(
                 re.sub(

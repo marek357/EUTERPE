@@ -31,19 +31,13 @@ def character_model(x: np.ndarray, y: np.ndarray) -> None:
     x_tr, x_val, y_tr, y_val = train_test_split(x, y, test_size=0.1, random_state=42)
     print('done - model')
     model: Sequential = Sequential()
-    model.add(
-        LSTM(
-            256,
-            input_shape=(x.shape[1], x.shape[2]),
-            return_sequences=True
-        )
-    )
-    model.add(Dropout(0.2))
-    model.add(LSTM(256))
+    model.add(LSTM(256, input_shape=(x.shape[1], x.shape[2])))
     model.add(Dropout(0.2))
     model.add(Dense(y.shape[1], activation='softmax'))
     model.compile(loss='categorical_crossentropy', metrics=['acc'], optimizer='adam')
+    print('ok00')
     filepath = "weights-improvement-{epoch:02d}-{loss:.4f}-bigger.hdf5"
+    print('ok01')
     checkpoint = ModelCheckpoint(
         filepath,
         monitor='loss',
@@ -52,6 +46,7 @@ def character_model(x: np.ndarray, y: np.ndarray) -> None:
         mode='min'
     )
     callbacks_list = [checkpoint]
+    print('ok02')
     model.fit(
         x_tr,
         y_tr,
@@ -61,5 +56,6 @@ def character_model(x: np.ndarray, y: np.ndarray) -> None:
         callbacks=callbacks_list,
         validation_data=(x_val, y_val)
     )
+    print('done')
     return
 
