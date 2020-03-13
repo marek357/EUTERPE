@@ -10,7 +10,7 @@ Plik z funkcjami do obslugi plikow, danych
 """
 
 
-def load_lyrics(genre: str) -> Tuple[List[str], Dict[str, int]]:
+def load_lyrics(genre: str) -> Tuple[List[str], Dict[str, int], Dict[int, str]]:
     """
     Funkcja laduje z dolaczonego pliku csv odpowiednie teksty
     zgodne z gatunkiem oraz zwraca slownik przekonwertowanych
@@ -24,17 +24,15 @@ def load_lyrics(genre: str) -> Tuple[List[str], Dict[str, int]]:
         lyrics_list (list): Lista tekstow utworow.
         char_to_int (dict of char: int): Slownik znakow
         i odpowiadajacych im liczb
+        int_to_char (dict of int: char): char_to_int^-1
     """
 
     lyrics_df = pd.read_csv('res/lyrics.csv')
     lyrics_list = []
     char_to_int = {}
+    int_to_char = {}
     char_set = set()
-    finish = 0
     for text, genre_value in zip(lyrics_df['lyrics'], lyrics_df['genre']):
-        if finish > 5000:
-            break
-        finish += 1
         if genre_value == genre:
             lyrics_list.append(
                 re.sub(
@@ -46,7 +44,8 @@ def load_lyrics(genre: str) -> Tuple[List[str], Dict[str, int]]:
             char_set.update(set(str(text)))
     for index, elem in enumerate(sorted(list(char_set))):
         char_to_int[elem] = index
-    return lyrics_list, char_to_int
+        int_to_char[index] = elem
+    return lyrics_list, char_to_int, int_to_char
 
 
 def encode_data(lyrics_list: List[str], char_to_int: Dict[str, int]

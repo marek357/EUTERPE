@@ -28,38 +28,21 @@ def character_model(x: np.ndarray, y: np.ndarray) -> None:
     Returns:
         None
     """
-    x_tr, x_val, y_tr, y_val = train_test_split(x, y, test_size=0.1, random_state=42)
-    print('done - model')
-    model: Sequential = Sequential()
-    model.add(
-        LSTM(
-            256,
-            input_shape=(x.shape[1], x.shape[2]),
-            return_sequences=True
-        )
-    )
+
+    print(x.shape)
+    print('-----')
+    print(y.shape)
+    print('-----')
+
+    model = Sequential()
+    model.add(LSTM(256, input_shape=(x.shape[1], x.shape[2]), return_sequences=True))
     model.add(Dropout(0.2))
     model.add(LSTM(256))
     model.add(Dropout(0.2))
     model.add(Dense(y.shape[1], activation='softmax'))
-    model.compile(loss='categorical_crossentropy', metrics=['acc'], optimizer='adam')
+    model.compile(loss='categorical_crossentropy', optimizer='adam')
     filepath = "weights-improvement-{epoch:02d}-{loss:.4f}-bigger.hdf5"
-    checkpoint = ModelCheckpoint(
-        filepath,
-        monitor='loss',
-        verbose=1,
-        save_best_only=True,
-        mode='min'
-    )
-    callbacks_list = [checkpoint]
-    model.fit(
-        x_tr,
-        y_tr,
-        verbose=2,
-        epochs=500,
-        batch_size=64,
-        callbacks=callbacks_list,
-        validation_data=(x_val, y_val)
-    )
+    checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=True, mode='min')
+    model.fit(x, y, epochs=50, batch_size=64, callbacks=[checkpoint])
     return
 
