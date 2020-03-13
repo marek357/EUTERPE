@@ -31,5 +31,3 @@ if __name__ == '__main__':
         x, y, char_to_int = load_data('/Users/marekmasiak/Desktop/')
         x, y = convert_to_numpy(x, y, 100, float(char_to_int))
         character_model(x, y)
-    print('done4')
-
