@@ -1,8 +1,6 @@
-from nltk.corpus import reuters, brown
-from nltk import bigrams, trigrams, ngrams
-from collections import Counter, defaultdict
+from nltk import bigrams
+from collections import defaultdict
 from random import randint
-from pprint import pprint
 
 """
 Plik generujący ngramy
