@@ -1,5 +1,6 @@
 from midiutil import MIDIFile
 import random
+import copy
 
 #oznaczenia rodzajów dźwięków w programie
 C=0
@@ -90,6 +91,11 @@ class Dzwiek:
 
     ####publiczne metody####
 
+    #tworzy kopię obiektu
+    def copy(this):
+        nowy=Dzwiek(this.rodzaj,this.oktawa)
+        return nowy
+
     #zamienia dźwięk na numer midi
     def toMidi(this):
         return 12*(this.oktawa+1)+this.rodzaj
@@ -124,8 +130,11 @@ class Dzwiek:
                 else:
                     this.rodzaj=skala.gama[skala.gama.index(x)+1]
                 return this
-        #pierwotny dźwięk był poza skalą
-        raise Exception
+        #pierwotny dźwięk był poza skalą, wracamy na skalę
+        if random.random()<0.5:
+            return this.fitScaleUp(skala)
+        else:
+            return this.fitScaleDown(skala)
 
     #obniża dźwięk o jeden w dół po skali
     def noteDown(this, skala):
@@ -137,8 +146,11 @@ class Dzwiek:
                 else:
                     this.rodzaj=skala.gama[skala.gama.index(x)-1]
                 return this
-        #pierwotny dźwięk był poza skalą
-        raise Exception   
+        #pierwotny dźwięk był poza skalą, wracamy na skalę
+        if random.random()<0.5:
+            return this.fitScaleUp(skala)
+        else:
+            return this.fitScaleDown(skala)
 
     #podwyższa wysokość dźwięku o [ile] półtonów
     def next(this, ile=1):
@@ -181,6 +193,44 @@ class Skala:
     def __init__(this, d1, d2, d3, d4, d5, d6, d7):
         this.gama = (d1,d2,d3,d4,d5,d6,d7)
 
+#klara obsługuje operacje na akordach
+class Akord:
+    #tworzy akord z podanym dźwiękiem jako bazą, dostosowuje tercje tak aby należała do podanej skali
+    def __init__(this, dzwiek, skala):
+        d=dzwiek.copy()
+        d.oktawa=3
+        this.chord=[d.copy(),d.copy().next(3).fitScaleUp(skala),d.next(7)]
+        this.podstawa=dzwiek.rodzaj
+    
+    #tworzy kopię obiektu
+    def copy(this):
+        return copy.deepcopy(this)
+
+    #tworzy kolejne przewroty akordu n razy, TODO: dla n>1 można zrobić optymalniej, dodać obsługę n<0
+    def transpose(this, n=1):
+        for i in range(n):
+            d=this.chord.pop(0)
+            d.oktawa+=1
+            this.chord.append(d)
+        return this
+    
+    #podnosi cały akord n oktaw do góry
+    def octaveDown(this, n=1):
+        for x in this.chord:
+            x.oktawa-=n
+        return this
+
+    #podnosi cały akord n oktaw w dół
+    def octaveUp(this,n=1):
+        for x in this.chord:
+            x.oktawa+=n
+        return this
+    
+    #modyfikuje losowo akord, TODO: trzeba by sprawdzić jakie procenty będą sensowne i dorobić więcej możliwości zmian
+    def variate(this):
+        this.transpose(random.randint(0,2))
+        this.octaveDown(random.randint(0,1))
+        return this
 
 
 #losowanie głównych parametrów utworu, TODO: sprawdzić sensowność zakresów losowania
@@ -210,12 +260,20 @@ skala=Skala(C,D,E,F,G,A,H) #skala C-dur
 while time < liczbaTaktow*metrum:
     duration=noteLength()
     note.nextNote(skala)
-    print(note.rodzaj, note.oktawa)
+    print(note.rodzaj, note.oktawa)#debug
     #na początku każdego nowego taktu powinien być nowy dźwięk
     if (metrum - time % metrum) < duration:
         duration = metrum - time % metrum
-    #uwydatnianie akcentów głośnością
+    #akcenty i akompaniament
     if (time % metrum) == 0:
+        #tworzy akord z aktualnie granego dźwięku
+        akord=Akord(note,skala)
+        #w 40% przypadków wylosowany akord jest modyfikowany
+        if random.random()<0.4:
+            akord.variate()
+        for x in akord.chord:
+            MyMIDI.addNote(track, 2, x.toMidi(), time, metrum, 70)
+        #uuwydatnianie akcentu głośnością
         volume = 120
     else:
         volume = 80
