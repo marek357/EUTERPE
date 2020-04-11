@@ -1,16 +1,19 @@
 from midiutil import MIDIFile
 import random
 
-#generowanie losowej melodii składającej się z 50 dźwięków, metrum 4/4, stała głośność, jeden instrument
-
-#niektóre dźwięki w midi
-A0=21
-B0=23
-C1=24
-D1=26
-E1=28
-F1=29
-C4=60
+#oznaczenia rodzajów dźwięków w programie
+C=0
+Cis=1
+D=2
+Dis=3
+E=4
+F=5
+Fis=6
+G=7
+Gis=8
+A=9
+B=10
+H=11
 
 
 #losowanie długości dźwięku
@@ -34,87 +37,190 @@ def noteLength():
     #cała nuta
     return 4
 
-#implementacja skipa z tabelki prawdopodobieństw
-def skip(note):
-    los = random.randint(1,100)
-    #kwinta
-    if los <= 25:
+
+#klasa trzyma dźwięk jako rodzaj będący nazwą dźwięku oraz numer oktawy w jakiej się dany dźwięk znajduje
+class Dzwiek:
+    #jeśli trzeci argument nie jest podany drugi jest traktowany jako numer midi
+    def __init__(this, dzwiek, oktawa=None):
+        if oktawa==None:
+            this.rodzaj=dzwiek%12
+            this.oktawa=dzwiek//12
+        else:
+            this.rodzaj=dzwiek
+            this.oktawa=oktawa
+
+    ####prywatne metody pomocnicze####
+
+    #implementacja skipa z tabelki prawdopodobieństw
+    def __skip(this, skala):
+        los = random.randint(1,100)
+        #kwinta
+        if los <= 25:
+            if random.random() < 0.5:
+                return this.next(7)
+            return this.prev(7)
+        #kwarta
+        elif los <= 27:
+            if random.random() < 0.5:
+                return this.next(5)
+            return this.prev(5)
+        #tercja (wielka lub mała w zależności od skali)
+        elif los <= 75:
+            if random.random() < 0.5:
+                return this.noteUp(skala).noteUp(skala)
+            return this.noteDown(skala).noteDown(skala)
+        #seksta (wielka lub mała w zależności od skali)
+        else:
+            if random.random() < 0.5:
+               for i in range(5):
+                  this.noteUp(skala)
+            else:
+                for i in range(5):
+                    this.noteDown(skala)
+        return this
+
+    #zwiększanie danego dźwięku o jeden w górę lub w dół po gamie
+    def __step(this, skala):
         if random.random() < 0.5:
-            return note + 7
-        return note - 7
-    #kwarta
-    if los <= 27:
-        if random.random() < 0.5:
-            return note + 5
-        return note - 5
-    #tercja wielka (TODO: na razie wszystko jest w dur)
-    if los <= 75:
-        if random.random() < 0.5:
-            return note + 4
-        return note - 4
-    #seksta wielka (TODO: tutaj podobnie jak dla tercji)
-    if random.random() < 0.5:
-       return note + 9
-    return note - 9
+            #dźwięk do góry
+            return this.noteUp(skala)
+        else:
+            #dźwięk w dół
+            return this.noteDown(skala)
+
+    ####publiczne metody####
+
+    #zamienia dźwięk na numer midi
+    def toMidi(this):
+        return 12*(this.oktawa+1)+this.rodzaj
+
+    #jeśli dźwięk jest poza skalą dopasowuje go do najbliższego dźwięku ze skali do góry
+    def fitScaleUp(this, skala):
+        for x in skala.gama:
+            if this.rodzaj <= x:
+                this.rodzaj=x
+                return this
+        this.rodzaj=skala.gama[0]
+        this.oktawa+=1
+        return this
+
+    #jeśli dźwięk jest poza skalą dopasowuje go do najbliższego dźwięku ze skali do góry
+    def fitScaleDown(this, skala):
+        for x in reversed(skala.gama):
+            if this.rodzaj >= x:
+                this.rodzaj=x
+                return this
+        this.rodzaj=skala.gama[-1]
+        this.oktawa-=1
+        return this
+
+    #podwyższa dźwięk o jeden do góry po skali
+    def noteUp(this, skala):
+        for x in skala.gama:
+            if this.rodzaj==x:
+                if skala.gama.index(x)==len(skala.gama)-1:
+                    this.rodzaj=skala.gama[0]
+                    this.oktawa+=1
+                else:
+                    this.rodzaj=skala.gama[skala.gama.index(x)+1]
+                return this
+        #pierwotny dźwięk był poza skalą
+        raise Exception
+
+    #obniża dźwięk o jeden w dół po skali
+    def noteDown(this, skala):
+        for x in reversed(skala.gama):
+            if this.rodzaj==x:
+                if skala.gama.index(x)==0:
+                    this.rodzaj=skala.gama[-1]
+                    this.oktawa-=1
+                else:
+                    this.rodzaj=skala.gama[skala.gama.index(x)-1]
+                return this
+        #pierwotny dźwięk był poza skalą
+        raise Exception   
+
+    #podwyższa wysokość dźwięku o [ile] półtonów
+    def next(this, ile=1):
+        temp=this.rodzaj
+        this.rodzaj+=ile%12
+        this.rodzaj%=12
+        this.oktawa+=ile//12 + 1 if this.rodzaj<temp else 0
+        return this
+
+    #obniża wysokość dźwięku o [ile] półtonów
+    def prev(this, ile=1):
+        temp=this.rodzaj
+        this.rodzaj-=ile%12
+        this.rodzaj%=12
+        this.oktawa-=ile//12 + 1 if this.rodzaj>temp else 0
+        return this
+
+    #zmiana na kolejny dźwięk na podstawie obecnego
+    def nextNote(this, skala):
+        los = random.randint(1,100)
+
+        #unison
+        if los <= 25:
+            return this
+        #oktawa
+        elif los <= 27:
+            if random.random() < 0.5:
+                this.oktawa-=1
+            this.oktawa+=1
+        #krok o 1
+        elif los <= 75:
+            return this.__step(skala)
+        #skip
+        else:
+            return this.__skip(skala)
+        return this
+
+#klasa zawierając dźwięki gamy
+class Skala:
+    def __init__(this, d1, d2, d3, d4, d5, d6, d7):
+        this.gama = (d1,d2,d3,d4,d5,d6,d7)
 
 
-#zwiększanie danego dźwięku o jeden w górę lub w dół po gamie
-def step(note):
-    if random.random() < 0.5:
-        #dźwięk do góry
-        i = 0
-        #przebiega po wszystkich dostępnych dźwiękach dla midi szukając dźwięków B lub E
-        while i < 9:
-            if (note == B0 + 12 * i) or (note == E1 + 12 * i):
-                return note + 1
-            i+=1
-        return note + 2
-    else:
-        #dźwięk w dół
-        i = 0
-        while i < 9:
-            if (note == C1 + 12 * i) or (note == F1 + 12 * i):
-                return note - 1
-            i+=1
-        return note - 2
 
-#losowanie kolejnego dźwięku na podstawie poprzedniego
-def nextNote(note):
-    los = random.randint(1,100)
+#losowanie głównych parametrów utworu, TODO: sprawdzić sensowność zakresów losowania
 
-    #unison
-    if los <= 25:
-        return note
-    #oktawa
-    if los <= 27:
-        if random.random() < 0.5:
-            return note + 12
-        return note - 12
-    #krok o 1
-    if los <= 75:
-        return step(note)
-    #skip
-    return skip(note)
+#tempo
+tempo=random.randint(60, 160)
+#ilość taktów w piosence
+liczbaTaktow=random.randint(30,100);
+#metrum, podstawą jest zawsze ćwierćnuta (np. po wylosowaniu 3 metrum to 3/4)
+metrum=random.randint(2,6);
 
 
 track    = 0
 channel  = 0
 time     = 0   # In beats
 duration = 1   # In beats
-tempo    = 80  # In BPM
 volume   = 100 # 0-127, as per the MIDI standard
 
 MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
                      # automatically created)
 MyMIDI.addTempo(track,time, tempo)
 
-note=60 #pierwszym dźwiękiem jest C4 arbitralnie wybranym
+note=Dzwiek(C,4) #pierwszym dźwiękiem jest C4 arbitralnie wybranym
+skala=Skala(C,D,E,F,G,A,H) #skala C-dur
 
-#generuje 30 losowych dźwięków według procentów z tabelki
-for i in range(30):
+#generacja piosenki
+while time < liczbaTaktow*metrum:
     duration=noteLength()
-    note=nextNote(note)
-    MyMIDI.addNote(track, channel, note, time, duration, volume)
+    note.nextNote(skala)
+    print(note.rodzaj, note.oktawa)
+    #na początku każdego nowego taktu powinien być nowy dźwięk
+    if (metrum - time % metrum) < duration:
+        duration = metrum - time % metrum
+    #uwydatnianie akcentów głośnością
+    if (time % metrum) == 0:
+        volume = 120
+    else:
+        volume = 80
+
+    MyMIDI.addNote(track, channel, note.toMidi(), time, duration, volume)
     time = time + duration
 
 with open("muzyka.mid", "wb") as output_file:
