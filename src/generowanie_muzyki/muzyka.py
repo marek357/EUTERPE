@@ -16,6 +16,10 @@ A=9
 B=10
 H=11
 
+#oznaczenia rodzajów skal
+Dur=1
+Mol=2
+Blues=3
 
 #losowanie długości dźwięku
 def noteLength():
@@ -45,7 +49,7 @@ class Dzwiek:
     def __init__(this, dzwiek, oktawa=None):
         if oktawa==None:
             this.rodzaj=dzwiek%12
-            this.oktawa=dzwiek//12
+            this.oktawa=dzwiek/12
         else:
             this.rodzaj=dzwiek
             this.oktawa=oktawa
@@ -58,18 +62,27 @@ class Dzwiek:
         #kwinta
         if los <= 25:
             if random.random() < 0.5:
-                return this.next(7)
-            return this.prev(7)
+                for i in range(4):
+                    this.noteUp(skala)
+            else:
+                for i in range(4):
+                    this.noteDown(skala)
         #kwarta
         elif los <= 27:
             if random.random() < 0.5:
-                return this.next(5)
-            return this.prev(5)
+                for i in range(3):
+                    this.noteUp(skala)
+            else:
+                for i in range(3):
+                    this.noteDown(skala)
         #tercja (wielka lub mała w zależności od skali)
         elif los <= 75:
             if random.random() < 0.5:
-                return this.noteUp(skala).noteUp(skala)
-            return this.noteDown(skala).noteDown(skala)
+                for i in range(2):
+                    this.noteUp(skala)
+            else:
+                for i in range(2):
+                    this.noteDown(skala)
         #seksta (wielka lub mała w zależności od skali)
         else:
             if random.random() < 0.5:
@@ -77,17 +90,16 @@ class Dzwiek:
                   this.noteUp(skala)
             else:
                 for i in range(5):
-                    this.noteDown(skala)
-        return this
+                  this.noteDown(skala)
 
     #zwiększanie danego dźwięku o jeden w górę lub w dół po gamie
     def __step(this, skala):
         if random.random() < 0.5:
             #dźwięk do góry
-            return this.noteUp(skala)
+            this.noteUp(skala)
         else:
             #dźwięk w dół
-            return this.noteDown(skala)
+            this.noteDown(skala)
 
     ####publiczne metody####
 
@@ -100,57 +112,25 @@ class Dzwiek:
     def toMidi(this):
         return 12*(this.oktawa+1)+this.rodzaj
 
-    #jeśli dźwięk jest poza skalą dopasowuje go do najbliższego dźwięku ze skali do góry
-    def fitScaleUp(this, skala):
-        for x in skala.gama:
-            if this.rodzaj <= x:
-                this.rodzaj=x
-                return this
-        this.rodzaj=skala.gama[0]
-        this.oktawa+=1
-        return this
-
-    #jeśli dźwięk jest poza skalą dopasowuje go do najbliższego dźwięku ze skali do góry
-    def fitScaleDown(this, skala):
-        for x in reversed(skala.gama):
-            if this.rodzaj >= x:
-                this.rodzaj=x
-                return this
-        this.rodzaj=skala.gama[-1]
-        this.oktawa-=1
-        return this
-
     #podwyższa dźwięk o jeden do góry po skali
     def noteUp(this, skala):
-        for x in skala.gama:
-            if this.rodzaj==x:
-                if skala.gama.index(x)==len(skala.gama)-1:
-                    this.rodzaj=skala.gama[0]
-                    this.oktawa+=1
-                else:
-                    this.rodzaj=skala.gama[skala.gama.index(x)+1]
-                return this
-        #pierwotny dźwięk był poza skalą, wracamy na skalę
-        if random.random()<0.5:
-            return this.fitScaleUp(skala)
+        idx = skala.gama.index(this.rodzaj)
+        if idx == len(skala.gama) - 1:
+            this.oktawa += 1
+            this.rodzaj = skala.gama[0]
         else:
-            return this.fitScaleDown(skala)
+            this.rodzaj = skala.gama[idx+1]
+        return this
 
     #obniża dźwięk o jeden w dół po skali
     def noteDown(this, skala):
-        for x in reversed(skala.gama):
-            if this.rodzaj==x:
-                if skala.gama.index(x)==0:
-                    this.rodzaj=skala.gama[-1]
-                    this.oktawa-=1
-                else:
-                    this.rodzaj=skala.gama[skala.gama.index(x)-1]
-                return this
-        #pierwotny dźwięk był poza skalą, wracamy na skalę
-        if random.random()<0.5:
-            return this.fitScaleUp(skala)
+        idx = skala.gama.index(this.rodzaj)
+        if idx == 0:
+            this.oktawa -= 1
+            this.rodzaj = skala.gama[len(skala.gama) - 1]
         else:
-            return this.fitScaleDown(skala)
+            this.rodzaj = skala.gama[idx - 1]
+        return this
 
     #podwyższa wysokość dźwięku o [ile] półtonów
     def next(this, ile=1):
@@ -174,32 +154,86 @@ class Dzwiek:
 
         #unison
         if los <= 25:
-            return this
+            this.oktawa = this.oktawa
         #oktawa
         elif los <= 27:
             if random.random() < 0.5:
                 this.oktawa-=1
-            this.oktawa+=1
+            else:
+                this.oktawa+=1
         #krok o 1
         elif los <= 75:
-            return this.__step(skala)
+            this.__step(skala)
         #skip
         else:
-            return this.__skip(skala)
+            this.__skip(skala)
+
         return this
+
+    #kontrola zbyt wysokich/niskich dzwiekow
+    def normalize(self):
+        if self.oktawa <= 2:
+            self.oktawa = 2
+        if self.oktawa >= 7:
+            self.oktawa = 7
+
+#funkcje generujące skale
+
+def generateMajorScale(key):
+    curr = key
+    scale = list()
+    for i in range(7):
+        scale.append(curr)
+        if i == 2 or i == 6:
+            curr = curr + 1
+        else:
+            curr = curr + 2
+        curr = curr % (H + 1)
+    return tuple(scale)
+
+#harmoniczna skala molowa
+def generateMinorScale(key):
+    curr = key
+    scale = list()
+    for i in range(7):
+        scale.append(curr)
+        if i == 1 or i == 4 or i == 6:
+            curr = curr + 1
+        else:
+            curr = curr + 2
+        curr = curr % (H + 1)
+    return tuple(scale)
+
+def generateBluesScale(key):
+    scale = list(generateMajorScale(key))
+    scale[2] = (scale[2] + H) % (H + 1)
+    scale[4] = (scale[4] + H) % (H + 1)
+    scale[6] = (scale[6] + H) % (H + 1)
+    return tuple(scale)
+
+def generateScale(key, type):
+    key = key % (H + 1)
+    if type == Dur:
+        return generateMajorScale(key)
+    elif type == Mol:
+        return generateMinorScale(key)
+    elif type == Blues:
+        return generateBluesScale(key)
 
 #klasa zawierając dźwięki gamy
 class Skala:
-    def __init__(this, d1, d2, d3, d4, d5, d6, d7):
-        this.gama = (d1,d2,d3,d4,d5,d6,d7)
+    def __init__(this, key, type):
+        this.key = key
+        this.type = type
+        this.gama = generateScale(key, type)
+
 
 #klara obsługuje operacje na akordach
 class Akord:
     #tworzy akord z podanym dźwiękiem jako bazą, dostosowuje tercje tak aby należała do podanej skali
     def __init__(this, dzwiek, skala):
         d=dzwiek.copy()
-        d.oktawa=3
-        this.chord=[d.copy(),d.copy().next(3).fitScaleUp(skala),d.next(7)]
+        this.chord=[d.copy(),d.copy().noteUp(skala).noteUp(skala),d.copy().noteUp(skala).noteUp(skala).noteUp(skala).noteUp(skala)]
         this.podstawa=dzwiek.rodzaj
     
     #tworzy kopię obiektu
@@ -229,18 +263,19 @@ class Akord:
     #modyfikuje losowo akord, TODO: trzeba by sprawdzić jakie procenty będą sensowne i dorobić więcej możliwości zmian
     def variate(this):
         this.transpose(random.randint(0,2))
-        this.octaveDown(random.randint(0,1))
+        #akompaniament brzmi ładniej o oktawę lub dwie oktawy niżej
+        this.octaveDown(random.randint(1,2))
         return this
 
 
-#losowanie głównych parametrów utworu, TODO: sprawdzić sensowność zakresów losowania
+#losowanie głównych parametrów utworu
 
 #tempo
-tempo=random.randint(60, 160)
+tempo=random.randint(60, 120)
 #ilość taktów w piosence
-liczbaTaktow=random.randint(30,100);
+liczbaTaktow=random.randint(30,70);
 #metrum, podstawą jest zawsze ćwierćnuta (np. po wylosowaniu 3 metrum to 3/4)
-metrum=random.randint(2,6);
+metrum=random.randint(2,4);
 
 
 track    = 0
@@ -253,13 +288,14 @@ MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
                      # automatically created)
 MyMIDI.addTempo(track,time, tempo)
 
-note=Dzwiek(C,4) #pierwszym dźwiękiem jest C4 arbitralnie wybranym
-skala=Skala(C,D,E,F,G,A,H) #skala C-dur
+note=Dzwiek(C, 4) #pierwszym dźwiękiem jest C 4 arbitralnie wybranym
+skala=Skala(C, Dur) #skala C-Dur
 
 #generacja piosenki
 while time < liczbaTaktow*metrum:
     duration=noteLength()
-    note.nextNote(skala)
+    note = note.nextNote(skala)
+    note.normalize()
     print(note.rodzaj, note.oktawa)#debug
     #na początku każdego nowego taktu powinien być nowy dźwięk
     if (metrum - time % metrum) < duration:
@@ -268,9 +304,9 @@ while time < liczbaTaktow*metrum:
     if (time % metrum) == 0:
         #tworzy akord z aktualnie granego dźwięku
         akord=Akord(note,skala)
-        #w 40% przypadków wylosowany akord jest modyfikowany
-        if random.random()<0.4:
-            akord.variate()
+        akord=Akord(note,skala)
+        #modyfikuje akord (przewroty, obniżenie o oktawę)
+        akord.variate()
         for x in akord.chord:
             MyMIDI.addNote(track, 2, x.toMidi(), time, metrum, 70)
         #uuwydatnianie akcentu głośnością
