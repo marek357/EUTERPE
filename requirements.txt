@@ -3,3 +3,5 @@ scikit-learn
 keras
 numpy
 pandas
+MIDIUtil
+pytest
