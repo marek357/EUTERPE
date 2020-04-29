@@ -1,4 +1,7 @@
-# Lyrics Generator
+# Jak z niego korzystać
+
+Aby wypróbować system tworzenia muzyki wystarzy uruchomic plik EUTERPE/src/generowanie_muzyki/muzyka.py
+
 
 # Opis projektu
 
