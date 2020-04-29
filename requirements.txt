@@ -3,3 +3,4 @@ keras
 numpy
 pandas
 MIDIUtil
+pytest
