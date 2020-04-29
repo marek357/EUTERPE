@@ -21,41 +21,24 @@ Dur=1
 Mol=2
 Blues=3
 
-#losowanie głównych parametrów utworu
-
-#tempo
-tempo=random.randint(70, 120)
-#metrum, podstawą jest zawsze ćwierćnuta (np. po wylosowaniu 3 metrum to 3/4)
-metrum=random.randint(2,4);
-
-track    = 0
-channel  = 0
-time     = 0   # In beats
-duration = 1   # In beats
-volume   = 100 # 0-127, as per the MIDI standard
-
-MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
-                     # automatically created)
-
-MyMIDI.addTempo(track, time, tempo)
 
 #losowanie długości dźwięku
-def noteLength():
+def noteLength(sixteenth=10,eight=31,quarter=40,quarterExtended=7,half=9):
     los=random.randint(1,100)
     #jedna szesnasta
-    if los <= 10:
+    if los <= sixteenth:
         return 0.25
     #jedna ósma
-    if los <= 41:
+    if los <= sixteenth+eight:
         return 0.5
     #ćwierć nuta
-    if los <= 81:
+    if los <= sixteenth+eight+quarter:
         return 1
     #ćwierć nuta z kropką
-    if los <= 88:
+    if los <= sixteenth+eight+quarter+quarterExtended:
         return 1.5
     #pół nuta
-    if los <= 97:
+    if los <= sixteenth+eight+quarter+quarterExtended+half:
         return 2
     #cała nuta
     return 4
@@ -284,8 +267,37 @@ class Akord:
         this.octaveDown(random.randint(0,1))
         return this
 
+def generateIntro(nOfMeasures, note, metrum, skala):
+    piece = list()
+    relative_time = 0
+    while relative_time < nOfMeasures * metrum:
+        new_sound = list()
+        duration = noteLength(2,25)
+        note = note.nextNote(skala)
+        note.normalize()
+        # na początku każdego nowego taktu powinien być nowy dźwięk
+        if (metrum - relative_time % metrum) < duration:
+            duration = metrum - relative_time % metrum
+        # akcenty i akompaniament
+        if (relative_time % metrum) == 0:
+            if (relative_time==0 or relative_time==metrum):
+                #na początku utworu początkowe akordy mogą zostać pominięte
+                if(random.random()<0.3):
+                    # tworzy akord z aktualnie granego dźwięku
+                    akord = Akord(note, skala)
+                    for x in akord.chord:
+                        new_sound.append([2, x.toMidi(), metrum, 70])
+            # uuwydatnianie akcentu głośnością
+            volume = 100
+        else:
+            volume = 60
 
-def generateMeasures(nOfMeasures, note, metrum, skala, track, volume, solo=False):
+        new_sound.append([1, note.toMidi(), duration, volume])
+        relative_time = relative_time + duration
+        piece.append(new_sound)
+    return piece
+
+def generateVerse(nOfMeasures, note, metrum, skala):
     piece = list()
     relative_time = 0
     while relative_time < nOfMeasures * metrum:
@@ -297,32 +309,111 @@ def generateMeasures(nOfMeasures, note, metrum, skala, track, volume, solo=False
         if (metrum - relative_time % metrum) < duration:
             duration = metrum - relative_time % metrum
         # akcenty i akompaniament
-        if (relative_time % metrum) == 0 and solo == False:
-            # tworzy akord z aktualnie granego dźwięku
+        if (relative_time % metrum) == 0:
             akord = Akord(note, skala)
-            # modyfikuje akord (przewroty, obniżenie o oktawę)
-            akord.variate()
             for x in akord.chord:
-                new_sound.append([track, 2, x.toMidi(), metrum, 70])
-            # uuwydatnianie akcentu głośnością
+                new_sound.append([2, x.toMidi(), metrum, 70])
+            # uwydatnianie akcentu głośnością
             volume = 120
         else:
             volume = 80
 
-        new_sound.append([track, 1, note.toMidi(), duration, volume])
+        new_sound.append([1, note.toMidi(), duration, volume])
         relative_time = relative_time + duration
         piece.append(new_sound)
-
     return piece
+
+def generateChorus(nOfMeasures, note, metrum, skala):
+    piece = list()
+    relative_time = 0
+    while relative_time < nOfMeasures * metrum:
+        new_sound = list()
+        duration = noteLength()
+        note = note.nextNote(skala)
+        note.normalize()
+        # na początku każdego nowego taktu powinien być nowy dźwięk
+        if (metrum - relative_time % metrum) < duration:
+            duration = metrum - relative_time % metrum
+        # akcenty i akompaniament
+        if (relative_time % metrum) == 0:
+            # tworzy akord z aktualnie granego dźwięku
+            akord = Akord(note, skala)
+            for x in akord.chord:
+                new_sound.append([2, x.toMidi(), metrum, 90])
+            # uwydatnianie akcentu głośnością
+            volume = 140
+        else:
+            volume = 100
+
+        new_sound.append([1, note.toMidi(), duration, volume])
+        relative_time = relative_time + duration
+        piece.append(new_sound)
+    return piece
+
+def generateOutro(nOfMeasures, note, metrum, skala):
+    piece = list()
+    relative_time = 0
+    while relative_time < nOfMeasures * metrum:
+        new_sound = list()
+        duration = noteLength(2,20)
+        note = note.nextNote(skala)
+        note.normalize()
+        # na początku każdego nowego taktu powinien być nowy dźwięk
+        if (metrum - relative_time % metrum) < duration:
+            duration = metrum - relative_time % metrum
+        # akcenty i akompaniament
+        if (relative_time % metrum) == 0:
+            # tworzy akord z aktualnie granego dźwięku
+            akord = Akord(note, skala)
+            for x in akord.chord:
+                new_sound.append([2, x.toMidi(), metrum, 70])
+            # uwydatnianie akcentu głośnością
+            volume = 100
+        else:
+            volume = 60
+
+        new_sound.append([1, note.toMidi(), duration, volume])
+        relative_time = relative_time + duration
+        piece.append(new_sound)
+    return piece
+
+def generateSolo(nOfMeasures, note, metrum, skala):
+    piece = list()
+    relative_time = 0
+    while relative_time < nOfMeasures * metrum:
+        new_sound = list()
+        duration = noteLength(40,35,15,7,3)
+        note = note.nextNote(skala)
+        note.normalize()
+        # na początku każdego nowego taktu powinien być nowy dźwięk
+        if (metrum - relative_time % metrum) < duration:
+            duration = metrum - relative_time % metrum
+        # akcenty i akompaniament
+        if (relative_time % metrum) == 0:
+            # tworzy akord z aktualnie granego dźwięku
+            if (relative_time==0):
+                akord = Akord(note, skala)
+                for x in akord.chord:
+                    new_sound.append([2, x.toMidi(), 2*metrum, 70])
+            # uwydatnianie akcentu głośnością
+            volume = 120
+        else:
+            volume = 80
+
+        new_sound.append([1, note.toMidi(), duration, volume])
+        relative_time = relative_time + duration
+        piece.append(new_sound)
+    return piece
+
 
 def appendToMidi(piece):
     global MyMIDI
     global time
     for sound in piece:
         for elem in sound:
-            MyMIDI.addNote(elem[0], elem[1], elem[2], time, elem[3], elem[4])
-            if elem[1] == 1:
-                time += elem[3]
+            MyMIDI.addNote(0, elem[0], elem[1], time, elem[2], elem[3])
+            if elem[0] == 1:
+                time += elem[2]
     # MyMIDI.addNote(track, channel, note.toMidi(), time, duration, volume)
 
 def generatePiece():
@@ -333,17 +424,17 @@ def generatePiece():
     powtorzeniaRefrenu = random.randint(1, 2)
     zwrotkaSolo = random.randint(-1, liczbaZwrotek-1)
 
-    intro = generateMeasures(random.randint(4, 7), note, metrum, skala, track, volume)
-    zwrotka = generateMeasures(random.randint(3, 7), note, metrum, skala, track, volume)
-    refren = generateMeasures(random.randint(3, 5), note, metrum, skala, track, volume)
-    solo = generateMeasures(random.randint(5, 7), note, metrum, skala, track, volume, True)
-    outro = generateMeasures(random.randint(4, 7), note, metrum, skala, track, volume)
+    intro = generateIntro(random.randint(4, 6), note, metrum, skala)
+    zwrotka = generateVerse(random.randint(8, 16), note, metrum, skala)
+    refren = generateChorus(random.randint(6, 12), note, metrum, skala)
+    solo = generateSolo(random.randint(8, 16), note, metrum, skala)
+    outro = generateOutro(random.randint(4, 8), note, metrum, skala)
 
     #debug
     print("Liczba zwrotek " + str(liczbaZwrotek))
     print("Powtórzenia refrenu " + str(powtorzeniaRefrenu))
     print("Zwrotka po której następuje solo " + str(zwrotkaSolo + 1))
-
+    
     appendToMidi(intro)
     for i in range(liczbaZwrotek):
         appendToMidi(zwrotka)
@@ -353,9 +444,25 @@ def generatePiece():
             appendToMidi(solo)
     appendToMidi(outro)
 
+#losowanie głównych parametrów utworu
+
+#tempo
+tempo=random.randint(70, 120)
+#metrum, podstawą jest zawsze ćwierćnuta (np. po wylosowaniu 3 metrum to 3/4)
+metrum=random.randint(2,4);
+
+track    = 0
+channel  = 0
+time     = 0   # In beats
+duration = 1   # In beats
+volume   = 100 # 0-127, as per the MIDI standard
+
+MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
+                     # automatically created)
+
+MyMIDI.addTempo(track, time, tempo)
+
 generatePiece()
 
 with open("muzyka.mid", "wb") as output_file:
     MyMIDI.writeFile(output_file)
-
-
