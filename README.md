@@ -4,9 +4,25 @@ Aby wypróbować system tworzenia muzyki wystarczy uruchomic plik EUTERPE/src/ge
 
 Aby wypróbować system tworzenia tekstu wystarczy uruchomić plik EUTERPE/src/generowanie_tekstu/tekst.py
 
-Dowolny skrypt uruchamiamy w terminalu wpisując `python3 [odpowiedni skrypt]`
+Oba skrypty uruchamiamy będąc w lokalizacji podanej powyżej
+
+Skrypt generowania muzyki uruchamiamy w terminalu wpisując `python3 muzyka.py`
+
+Skrypt generowania tekstu uruchamiamy w terminalu wpisując `python3 tekst.py gatunek_muzyki długość_tekstu_piosenki`
 
 Życzymy dużo zabawy z naszymi generatorami!
+
+
+# Dostępne gatunki
+
+Obecnie dostępne gatunki generowania tekstu to:
+
+'Other', 'Metal', 'Country', 'R&B', 'Folk', 'Rock', 'Not Available', 'Jazz', 'Indie', 'Electronic', 'Pop', 'Hip-Hop'
+
+Można uzyskać listę obecnie wspieranych gatunków muzycznych przez uruchomienie skryptu znajdującego się w lokalizacji EUTERPE/src/checkAvailGenres.py
+
+Znajdując się w EUTERPE/src możemy go wywołać w następujący sposób `python3 checkAvailGenres.py`
+
 
 # Opis projektu
 
