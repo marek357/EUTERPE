@@ -1,7 +1,12 @@
 # Jak z niego korzystać
 
-Aby wypróbować system tworzenia muzyki wystarzy uruchomic plik EUTERPE/src/generowanie_muzyki/muzyka.py
+Aby wypróbować system tworzenia muzyki wystarczy uruchomic plik EUTERPE/src/generowanie_muzyki/muzyka.py
 
+Aby wypróbować system tworzenia tekstu wystarczy uruchomić plik EUTERPE/src/generowanie_tekstu/tekst.py
+
+Dowolny skrypt uruchamiamy w terminalu wpisując `python3 [odpowiedni skrypt]`
+
+Życzymy dużo zabawy z naszymi generatorami!
 
 # Opis projektu
 
