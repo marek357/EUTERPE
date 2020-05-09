@@ -267,7 +267,223 @@ class Akord:
         this.octaveDown(random.randint(0,1))
         return this
 
-def generateIntro(nOfMeasures, note, metrum, skala):
+"""
+Klasa pozwalająca zarządzać używanymi w piosence instrumentami
+
+Kody dostępnych intrumentów są następujące:
+Piano:
+1 Acoustic Grand Piano
+2 Bright Acoustic Piano
+3 Electric Grand Piano
+4 Honky-tonk Piano
+5 Electric Piano 1
+6 Electric Piano 2
+7 Harpsichord
+8 Clavinet
+
+Chromatic Percussion:
+9 Celesta
+10 Glockenspiel
+11 Music Box
+12 Vibraphone
+13 Marimba
+14 Xylophone
+15 Tubular Bells
+16 Dulcimer
+
+Organ:
+17 Drawbar Organ
+18 Percussive Organ
+19 Rock Organ
+20 Church Organ
+21 Reed Organ
+22 Accordion
+23 Harmonica
+24 Tango Accordion
+
+Guitar:
+25 Acoustic Guitar (nylon)
+26 Acoustic Guitar (steel)
+27 Electric Guitar (jazz)
+28 Electric Guitar (clean)
+29 Electric Guitar (muted)
+30 Overdriven Guitar
+31 Distortion Guitar
+32 Guitar harmonics
+
+Bass:
+33 Acoustic Bass
+34 Electric Bass (finger)
+35 Electric Bass (pick)
+36 Fretless Bass
+37 Slap Bass 1
+38 Slap Bass 2
+39 Synth Bass 1
+40 Synth Bass 2
+
+Strings:
+41 Violin
+42 Viola
+43 Cello
+44 Contrabass
+45 Tremolo Strings
+46 Pizzicato Strings
+47 Orchestral Harp
+48 Timpani
+
+Strings (continued):
+49 String Ensemble 1
+50 String Ensemble 2
+51 Synth Strings 1
+52 Synth Strings 2
+53 Choir Aahs
+54 Voice Oohs
+55 Synth Voice
+56 Orchestra Hit
+
+Brass:
+57 Trumpet
+58 Trombone
+59 Tuba
+60 Muted Trumpet
+61 French Horn
+62 Brass Section
+63 Synth Brass 1
+64 Synth Brass 2
+
+Reed:
+65 Soprano Sax
+66 Alto Sax
+67 Tenor Sax
+68 Baritone Sax
+69 Oboe
+70 English Horn
+71 Bassoon
+72 Clarinet
+
+Pipe:
+73 Piccolo
+74 Flute
+75 Recorder
+76 Pan Flute
+77 Blown Bottle
+78 Shakuhachi
+79 Whistle
+80 Ocarina
+
+Synth Lead:
+81 Lead 1 (square)
+82 Lead 2 (sawtooth)
+83 Lead 3 (calliope)
+84 Lead 4 (chiff)
+85 Lead 5 (charang)
+86 Lead 6 (voice)
+87 Lead 7 (fifths)
+88 Lead 8 (bass + lead)
+
+Synth Pad:
+89 Pad 1 (new age)
+90 Pad 2 (warm)
+91 Pad 3 (polysynth)
+92 Pad 4 (choir)
+93 Pad 5 (bowed)
+94 Pad 6 (metallic)
+95 Pad 7 (halo)
+96 Pad 8 (sweep)
+
+Synth Effects:
+97 FX 1 (rain)
+98 FX 2 (soundtrack)
+99 FX 3 (crystal)
+100 FX 4 (atmosphere)
+101 FX 5 (brightness)
+102 FX 6 (goblins)
+103 FX 7 (echoes)
+104 FX 8 (sci-fi)
+
+Ethnic:
+105 Sitar
+106 Banjo
+107 Shamisen
+108 Koto
+109 Kalimba
+110 Bag pipe
+111 Fiddle
+112 Shanai
+
+Percussive:
+113 Tinkle Bell
+114 Agogo
+115 Steel Drums
+116 Woodblock
+117 Taiko Drum
+118 Melodic Tom
+119 Synth Drum
+
+Sound effects:
+120 Reverse Cymbal
+121 Guitar Fret Noise
+122 Breath Noise
+123 Seashore
+124 Bird Tweet
+125 Telephone Ring
+126 Helicopter
+127 Applause
+128 Gunshot
+"""
+class Instrumenty:
+    #losuje dowolne instrumenty i przypisuje im kanały w utworze
+    def __init__(this, midiFile, track=0):
+        this.main=random.randint(1,112)
+        this.accompaniment=random.randint(1,112)
+        this.second=random.randint(1,112)
+        this.solo=random.randint(1,112)
+        this.mainChan=0
+        this.accompanimentChan=1
+        this.secondChan=2
+        this.soloChan=3
+        this.midi=midiFile
+        midiFile.addProgramChange(track, this.mainChan, 0, this.main-1)
+        midiFile.addProgramChange(track, this.accompanimentChan, time, this.accompaniment-1)
+        midiFile.addProgramChange(track, this.secondChan, 0, this.second-1)
+        midiFile.addProgramChange(track, this.soloChan, 0, this.solo-1)
+    #ustawia główny instrument
+    def setMain(this, instrument, time=0):
+        this.main=instrument-1
+        midi.addProgramChange(track, mainChan, time, main)
+    #ustawia instrument używany w akompaniamencie
+    def setAccompaniment(this, instrument, time=0, track=0):
+        this.accompaniment=instrument-1
+        midi.addProgramChange(track, accompanimentChan, time, accompaniment)
+    #ustawia dodatkowy instrument
+    def setSecond(this, instrument, time=0, track=0):
+        this.second=instrument-1
+        this.midi.addProgramChange(track, secondChan, time, second)
+    #ustawia instrument solowy
+    def setsolo(this, instrument, time=0, track=0):
+        this.solo=instrument-1
+        this.midi.addProgramChange(track, soloChan, time, solo)
+    #ustawia dowolny instrumnt na wybranym kanale
+    def setInstrument(this, instrument, channel, time=0, track=0):
+        this.midi.addProgramChange(track, channel, time, instrument-1)
+
+    #metody zwracające numery kanałów odpowiednich instrumentów
+    def getMain(this):
+        return this.mainChan
+    def getAccompaniment(this):
+        return this.accompanimentChan    
+    def getSecond(this):
+        return this.secondChan
+    def getSolo(this):
+        return this.soloChan
+
+    #metody zwracające numery instrumentów z różnych grup
+    def getSoundEffect():
+        return random.randint(120,128)
+    def getGuitar():
+        return random.randint(25,32)
+
+def generateIntro(nOfMeasures, note, metrum, skala, instruments):
     piece = list()
     relative_time = 0
     while relative_time < nOfMeasures * metrum:
@@ -286,18 +502,18 @@ def generateIntro(nOfMeasures, note, metrum, skala):
                     # tworzy akord z aktualnie granego dźwięku
                     akord = Akord(note, skala)
                     for x in akord.chord:
-                        new_sound.append([2, x.toMidi(), metrum, 70])
+                        new_sound.append([instruments.getAccompaniment(), x.toMidi(), metrum, 70])
             # uuwydatnianie akcentu głośnością
             volume = 100
         else:
             volume = 60
 
-        new_sound.append([1, note.toMidi(), duration, volume])
+        new_sound.append([instruments.getMain(), note.toMidi(), duration, volume])
         relative_time = relative_time + duration
         piece.append(new_sound)
     return piece
 
-def generateVerse(nOfMeasures, note, metrum, skala):
+def generateVerse(nOfMeasures, note, metrum, skala, instruments):
     piece = list()
     relative_time = 0
     while relative_time < nOfMeasures * metrum:
@@ -312,20 +528,26 @@ def generateVerse(nOfMeasures, note, metrum, skala):
         if (relative_time % metrum) == 0:
             akord = Akord(note, skala)
             for x in akord.chord:
-                new_sound.append([2, x.toMidi(), metrum, 70])
+                new_sound.append([instruments.getAccompaniment(), x.toMidi(), metrum, 70])
             # uwydatnianie akcentu głośnością
             volume = 120
         else:
             volume = 80
 
-        new_sound.append([1, note.toMidi(), duration, volume])
+        new_sound.append([instruments.getMain(), note.toMidi(), duration, volume])
         relative_time = relative_time + duration
         piece.append(new_sound)
     return piece
 
-def generateChorus(nOfMeasures, note, metrum, skala):
+def generateChorus(nOfMeasures, note, metrum, skala, instruments):
     piece = list()
     relative_time = 0
+    #w refrenie do grania melodii może być wybrany instrument pomocniczy
+    if random.random()<0.4:
+        instrument=instruments.getMain()
+    else:
+        instrument=instruments.getSecond()
+
     while relative_time < nOfMeasures * metrum:
         new_sound = list()
         duration = noteLength()
@@ -339,18 +561,18 @@ def generateChorus(nOfMeasures, note, metrum, skala):
             # tworzy akord z aktualnie granego dźwięku
             akord = Akord(note, skala)
             for x in akord.chord:
-                new_sound.append([2, x.toMidi(), metrum, 90])
+                new_sound.append([instruments.getAccompaniment(), x.toMidi(), metrum, 90])
             # uwydatnianie akcentu głośnością
             volume = 140
         else:
             volume = 100
 
-        new_sound.append([1, note.toMidi(), duration, volume])
+        new_sound.append([instrument, note.toMidi(), duration, volume])
         relative_time = relative_time + duration
         piece.append(new_sound)
     return piece
 
-def generateOutro(nOfMeasures, note, metrum, skala):
+def generateOutro(nOfMeasures, note, metrum, skala, instruments):
     piece = list()
     relative_time = 0
     while relative_time < nOfMeasures * metrum:
@@ -366,20 +588,25 @@ def generateOutro(nOfMeasures, note, metrum, skala):
             # tworzy akord z aktualnie granego dźwięku
             akord = Akord(note, skala)
             for x in akord.chord:
-                new_sound.append([2, x.toMidi(), metrum, 70])
+                new_sound.append([instruments.getAccompaniment(), x.toMidi(), metrum, 70])
             # uwydatnianie akcentu głośnością
             volume = 100
         else:
             volume = 60
 
-        new_sound.append([1, note.toMidi(), duration, volume])
+        new_sound.append([instruments.getMain(), note.toMidi(), duration, volume])
         relative_time = relative_time + duration
         piece.append(new_sound)
     return piece
 
-def generateSolo(nOfMeasures, note, metrum, skala):
+def generateSolo(nOfMeasures, note, metrum, skala, instruments):
     piece = list()
     relative_time = 0
+    if random.random()<0.8:
+        instrument=instruments.getSolo()
+    else:
+        instrument=instruments.getMain()
+
     while relative_time < nOfMeasures * metrum:
         new_sound = list()
         duration = noteLength(40,35,15,7,3)
@@ -394,13 +621,13 @@ def generateSolo(nOfMeasures, note, metrum, skala):
             if (relative_time==0):
                 akord = Akord(note, skala)
                 for x in akord.chord:
-                    new_sound.append([2, x.toMidi(), 2*metrum, 70])
+                    new_sound.append([instruments.getAccompaniment(), x.toMidi(), 2*metrum, 70])
             # uwydatnianie akcentu głośnością
             volume = 120
         else:
             volume = 80
 
-        new_sound.append([1, note.toMidi(), duration, volume])
+        new_sound.append([instrument, note.toMidi(), duration, volume])
         relative_time = relative_time + duration
         piece.append(new_sound)
     return piece
@@ -409,31 +636,37 @@ def generateSolo(nOfMeasures, note, metrum, skala):
 def appendToMidi(piece):
     global MyMIDI
     global time
+    global instruments
     for sound in piece:
         for elem in sound:
             MyMIDI.addNote(0, elem[0], elem[1], time, elem[2], elem[3])
-            if elem[0] == 1:
+            if elem[0] != instruments.getAccompaniment():
                 time += elem[2]
     # MyMIDI.addNote(track, channel, note.toMidi(), time, duration, volume)
 
-def generatePiece():
-    skala = Skala(C, Dur)  # skala C-Dur
+def generatePiece(instruments):
+    skala = Skala(F, Dur)  # skala C-Dur
     note = Dzwiek(list(skala.gama)[random.randint(0, 6)], random.randint(3, 5)) # losujemy początek ze skali
 
     liczbaZwrotek = random.randint(1, 3)
     powtorzeniaRefrenu = random.randint(1, 2)
     zwrotkaSolo = random.randint(-1, liczbaZwrotek-1)
 
-    intro = generateIntro(random.randint(4, 6), note, metrum, skala)
-    zwrotka = generateVerse(random.randint(8, 16), note, metrum, skala)
-    refren = generateChorus(random.randint(6, 12), note, metrum, skala)
-    solo = generateSolo(random.randint(8, 16), note, metrum, skala)
-    outro = generateOutro(random.randint(4, 8), note, metrum, skala)
+    intro = generateIntro(random.randint(4, 6), note, metrum, skala, instruments)
+    zwrotka = generateVerse(random.randint(8, 16), note, metrum, skala, instruments)
+    refren = generateChorus(random.randint(6, 12), note, metrum, skala, instruments)
+    solo = generateSolo(random.randint(8, 16), note, metrum, skala, instruments)
+    outro = generateOutro(random.randint(4, 8), note, metrum, skala, instruments)
 
     #debug
     print("Liczba zwrotek " + str(liczbaZwrotek))
     print("Powtórzenia refrenu " + str(powtorzeniaRefrenu))
     print("Zwrotka po której następuje solo " + str(zwrotkaSolo + 1))
+    print("\nInstrumenty:")
+    print("main "+str(instruments.main))
+    print("accompaniment "+str(instruments.accompaniment))
+    print("second "+str(instruments.second))
+    print("solo "+str(instruments.solo))
     
     appendToMidi(intro)
     for i in range(liczbaZwrotek):
@@ -452,17 +685,17 @@ tempo=random.randint(70, 120)
 metrum=random.randint(2,4);
 
 track    = 0
-channel  = 0
 time     = 0   # In beats
-duration = 1   # In beats
-volume   = 100 # 0-127, as per the MIDI standard
 
 MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
                      # automatically created)
 
+#tworzenie zestawu instrumentów używanych w piosence
+instruments=Instrumenty(MyMIDI)
+
 MyMIDI.addTempo(track, time, tempo)
 
-generatePiece()
+generatePiece(instruments)
 
 with open("muzyka.mid", "wb") as output_file:
     MyMIDI.writeFile(output_file)

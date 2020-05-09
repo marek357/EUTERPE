@@ -2,6 +2,7 @@ from src.dataHelper import load_lyrics, encode_data, convert_to_numpy
 from src.dataHelper import save_data, load_data
 from src.modelHelper import character_model
 from src.generator import generate
+from src.ngrams import ngram_gen, predict_next_words
 
 if __name__ == '__main__':
     """
@@ -15,7 +16,12 @@ if __name__ == '__main__':
     4) convert_to_numpy
     """
     LOAD_DATA = True
-    if LOAD_DATA:
+    ngrams = True
+    if ngrams:
+        lyrics_list, _, _ = load_lyrics('Folk')
+        model = ngram_gen(lyrics_list)
+        print(predict_next_words('your', model))
+    elif LOAD_DATA:
         lyrics_list, char_to_int, int_to_char = load_lyrics('Folk')
         print('done1')
         x_list, y_list = encode_data(lyrics_list, char_to_int)

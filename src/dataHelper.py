@@ -3,6 +3,7 @@ import re
 import pandas as pd
 import numpy as np
 import json
+from nltk.tokenize import TweetTokenizer
 from keras.utils import np_utils
 
 """
@@ -153,3 +154,28 @@ def load_data(path: str) -> Tuple[List[List[int]], List[int]]:
     with open(path + 'y_list.json', 'r') as y_file:
         y_list = json.loads(y_file.read())
     return x_list, y_list
+
+
+def load_lyrics_words(genre: str) -> List[str]:
+    """
+    Funkcja ladujaca z datasetu piosenki odpowiedniego 
+    gatunku i zwracajaca liste slow, dla modelu ngramu
+
+    Parameters:
+        genre (str): gatunek muzyki
+
+    Returns:
+        word_list (list): lista slow
+    """
+
+    lyrics_df = pd.read_csv('../../res/lyrics.csv')
+    lyrics_list = []
+    tokenizer = TweetTokenizer()
+    for text, genre_value in zip(lyrics_df['lyrics'], lyrics_df['genre']):
+        if genre_value == genre:
+            try:
+                lyrics_list.append(tokenizer.tokenize(text))
+            except:
+                pass
+    return lyrics_list
+    
