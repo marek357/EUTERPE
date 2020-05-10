@@ -482,12 +482,100 @@ class Instrumenty:
         return random.randint(120,128)
     def getGuitar():
         return random.randint(25,32)
+#klasa pozwalająca tworzyć dźwięki do późniejszego dołączenia do głównej części utworu
+class Sound:
+    def __init__(this, relTime, channel, note, duration, volume):
+        this.relTime=relTime
+        this.channel=channel
+        this.note=note
+        this.duration=duration
+        this.volume=volume
 
-def generateIntro(nOfMeasures, note, metrum, skala, instruments):
+"""
+Klasa tworząca losowy bit perkusyjny wykorzysywany w utworze. 
+W parametrze bit trzymane są wszystkie dźwięki dla pojedynczego taktu.
+
+Dostępne instrumenty perkusyjne:
+35 Acoustic Bass Drum
+36 Bass Drum 1
+37 Side Stick/Rimshot
+38 Acoustic Snare
+39 Hand Clap
+40 Electric Snare
+41 Low Floor Tom
+42 Closed Hi-hat
+43 High Floor Tom
+44 Pedal Hi-hat
+45 Low Tom
+46 Open Hi-hat
+47 Low-Mid Tom
+48 Hi-Mid Tom
+49 Crash Cymbal 1
+50 High Tom
+51 Ride Cymbal 1
+52 Chinese Cymbal
+53 Ride Bell
+54 Tambourine
+55 Splash Cymbal
+56 Cowbell
+57 Crash Cymbal 2
+58 Vibra Slap
+59 Ride Cymbal 2
+60 High Bongo
+61 Low Bongo
+62 Mute High Conga
+63 Open High Conga
+64 Low Conga
+65 High Timbale
+66 Low Timbale
+67 High Agogô
+68 Low Agogô
+69 Cabasa
+70 Maracas
+71 Short Whistle
+72 Long Whistle
+73 Short Güiro
+74 Long Güiro
+75 Claves
+76 High Wood Block
+77 Low Wood Block
+78 Mute Cuíca
+79 Open Cuíca
+80 Mute Triangle
+81 Open Triangle
+"""
+class Drums:
+    def __init__(this, metrum):
+        this.metrum=metrum
+        this.first=random.randint(35,81)
+        this.second=random.randint(35,81)
+        this.third=random.randint(35,81)
+        this.bit=list()
+        this.bit.append(Sound(0,9,this.first,1,120))
+        if random.random()<0.9:
+            for i in range(metrum):
+                this.bit.append(Sound(i,9,this.second,1,100))
+        if random.random()<0.8:
+            if(metrum==3):
+                this.bit.append(Sound(1,9,this.third,1,100))
+                this.bit.append(Sound(2,9,this.third,1,100))
+            if(metrum==2):
+                this.bit.append(Sound(1,9,this.third,1,100))
+            if(metrum==4):
+                this.bit.append(Sound(2,9,this.third,1,100))
+
+def generateIntro(nOfMeasures, note, metrum, skala, instruments, perkusja):
     piece = list()
     relative_time = 0
+
+    #generacja dźwięków perkusji
+    if perkusja is not None:
+        for i in range(nOfMeasures):
+            for j in perkusja.bit:
+                if j.note==perkusja.first:
+                    piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+
     while relative_time < nOfMeasures * metrum:
-        new_sound = list()
         duration = noteLength(2,25)
         note = note.nextNote(skala)
         note.normalize()
@@ -502,22 +590,27 @@ def generateIntro(nOfMeasures, note, metrum, skala, instruments):
                     # tworzy akord z aktualnie granego dźwięku
                     akord = Akord(note, skala)
                     for x in akord.chord:
-                        new_sound.append([instruments.getAccompaniment(), x.toMidi(), metrum, 70])
+                        piece.append(Sound(relative_time, instruments.getAccompaniment(), x.toMidi(), metrum, 70))
             # uuwydatnianie akcentu głośnością
             volume = 100
         else:
             volume = 60
 
-        new_sound.append([instruments.getMain(), note.toMidi(), duration, volume])
+        piece.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
         relative_time = relative_time + duration
-        piece.append(new_sound)
     return piece
 
-def generateVerse(nOfMeasures, note, metrum, skala, instruments):
+def generateVerse(nOfMeasures, note, metrum, skala, instruments, perkusja):
     piece = list()
     relative_time = 0
+
+    #generacja dźwięków perkusji
+    if perkusja is not None:
+        for i in range(nOfMeasures):
+            for j in perkusja.bit:
+                piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+
     while relative_time < nOfMeasures * metrum:
-        new_sound = list()
         duration = noteLength()
         note = note.nextNote(skala)
         note.normalize()
@@ -528,28 +621,32 @@ def generateVerse(nOfMeasures, note, metrum, skala, instruments):
         if (relative_time % metrum) == 0:
             akord = Akord(note, skala)
             for x in akord.chord:
-                new_sound.append([instruments.getAccompaniment(), x.toMidi(), metrum, 70])
+                piece.append(Sound(relative_time, instruments.getAccompaniment(), x.toMidi(), metrum, 70))
             # uwydatnianie akcentu głośnością
             volume = 120
         else:
             volume = 80
 
-        new_sound.append([instruments.getMain(), note.toMidi(), duration, volume])
+        piece.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
         relative_time = relative_time + duration
-        piece.append(new_sound)
     return piece
 
-def generateChorus(nOfMeasures, note, metrum, skala, instruments):
+def generateChorus(nOfMeasures, note, metrum, skala, instruments, perkusja):
     piece = list()
     relative_time = 0
+
+    #generacja dźwięków perkusji
+    if perkusja is not None:
+        for i in range(nOfMeasures):
+            for j in perkusja.bit:
+                piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+
     #w refrenie do grania melodii może być wybrany instrument pomocniczy
     if random.random()<0.4:
         instrument=instruments.getMain()
     else:
         instrument=instruments.getSecond()
-
     while relative_time < nOfMeasures * metrum:
-        new_sound = list()
         duration = noteLength()
         note = note.nextNote(skala)
         note.normalize()
@@ -561,22 +658,28 @@ def generateChorus(nOfMeasures, note, metrum, skala, instruments):
             # tworzy akord z aktualnie granego dźwięku
             akord = Akord(note, skala)
             for x in akord.chord:
-                new_sound.append([instruments.getAccompaniment(), x.toMidi(), metrum, 90])
+                piece.append(Sound(relative_time, instruments.getAccompaniment(), x.toMidi(), metrum, 90))
             # uwydatnianie akcentu głośnością
             volume = 140
         else:
             volume = 100
 
-        new_sound.append([instrument, note.toMidi(), duration, volume])
+        piece.append(Sound(relative_time, instrument, note.toMidi(), duration, volume))
         relative_time = relative_time + duration
-        piece.append(new_sound)
     return piece
 
-def generateOutro(nOfMeasures, note, metrum, skala, instruments):
+def generateOutro(nOfMeasures, note, metrum, skala, instruments, perkusja):
     piece = list()
     relative_time = 0
+
+    #generacja dźwięków perkusji
+    if perkusja is not None:
+        for i in range(nOfMeasures):
+            for j in perkusja.bit:
+                if j.note==perkusja.first:
+                    piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+
     while relative_time < nOfMeasures * metrum:
-        new_sound = list()
         duration = noteLength(2,20)
         note = note.nextNote(skala)
         note.normalize()
@@ -588,27 +691,33 @@ def generateOutro(nOfMeasures, note, metrum, skala, instruments):
             # tworzy akord z aktualnie granego dźwięku
             akord = Akord(note, skala)
             for x in akord.chord:
-                new_sound.append([instruments.getAccompaniment(), x.toMidi(), metrum, 70])
+                piece.append(Sound(relative_time, instruments.getAccompaniment(), x.toMidi(), metrum, 70))
             # uwydatnianie akcentu głośnością
             volume = 100
         else:
             volume = 60
 
-        new_sound.append([instruments.getMain(), note.toMidi(), duration, volume])
+        piece.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
         relative_time = relative_time + duration
-        piece.append(new_sound)
     return piece
 
-def generateSolo(nOfMeasures, note, metrum, skala, instruments):
+def generateSolo(nOfMeasures, note, metrum, skala, instruments, perkusja):
     piece = list()
     relative_time = 0
+
+    #generacja dźwięków perkusji
+    if perkusja is not None:
+        for i in range(nOfMeasures):
+            for j in perkusja.bit:
+                if j.note==perkusja.first or j.note==perkusja.third:
+                    piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+
     if random.random()<0.8:
         instrument=instruments.getSolo()
     else:
         instrument=instruments.getMain()
 
     while relative_time < nOfMeasures * metrum:
-        new_sound = list()
         duration = noteLength(40,35,15,7,3)
         note = note.nextNote(skala)
         note.normalize()
@@ -621,42 +730,48 @@ def generateSolo(nOfMeasures, note, metrum, skala, instruments):
             if (relative_time==0):
                 akord = Akord(note, skala)
                 for x in akord.chord:
-                    new_sound.append([instruments.getAccompaniment(), x.toMidi(), 2*metrum, 70])
+                    piece.append(Sound(relative_time, instruments.getAccompaniment(), x.toMidi(), 2*metrum, 70))
             # uwydatnianie akcentu głośnością
             volume = 120
         else:
             volume = 80
 
-        new_sound.append([instrument, note.toMidi(), duration, volume])
+        piece.append(Sound(relative_time, instrument, note.toMidi(), duration, volume))
         relative_time = relative_time + duration
-        piece.append(new_sound)
     return piece
 
 
-def appendToMidi(piece):
+def appendToMidi(piece, pieceDuration):
     global MyMIDI
     global time
     global instruments
     for sound in piece:
-        for elem in sound:
-            MyMIDI.addNote(0, elem[0], elem[1], time, elem[2], elem[3])
-            if elem[0] != instruments.getAccompaniment():
-                time += elem[2]
-    # MyMIDI.addNote(track, channel, note.toMidi(), time, duration, volume)
+        MyMIDI.addNote(0,sound.channel, sound.note, sound.relTime+time, sound.duration, sound.volume)
+    time+=pieceDuration
 
-def generatePiece(instruments):
+def generatePiece(instruments, metrum):
     skala = Skala(F, Dur)  # skala C-Dur
     note = Dzwiek(list(skala.gama)[random.randint(0, 6)], random.randint(3, 5)) # losujemy początek ze skali
+    #60% szans na pojawienie się perkusji w utworze
+    if random.random()<0.6:
+        perkusja= Drums(metrum)
+    else:
+        perkusja=None
 
     liczbaZwrotek = random.randint(1, 3)
     powtorzeniaRefrenu = random.randint(1, 2)
     zwrotkaSolo = random.randint(-1, liczbaZwrotek-1)
 
-    intro = generateIntro(random.randint(4, 6), note, metrum, skala, instruments)
-    zwrotka = generateVerse(random.randint(8, 16), note, metrum, skala, instruments)
-    refren = generateChorus(random.randint(6, 12), note, metrum, skala, instruments)
-    solo = generateSolo(random.randint(8, 16), note, metrum, skala, instruments)
-    outro = generateOutro(random.randint(4, 8), note, metrum, skala, instruments)
+    dlugoscIntro=random.randint(4, 6)
+    dlugoscZwrotka=random.randint(8, 16)
+    dlugoscRefren=random.randint(6, 12)
+    dlugoscSolo=random.randint(8, 16)
+    dlugoscOutro=random.randint(4, 8)
+    intro = generateIntro(dlugoscIntro, note, metrum, skala, instruments, perkusja)
+    zwrotka = generateVerse(dlugoscZwrotka, note, metrum, skala, instruments, perkusja)
+    refren = generateChorus(dlugoscRefren, note, metrum, skala, instruments, perkusja)
+    solo = generateSolo(dlugoscSolo, note, metrum, skala, instruments, perkusja)
+    outro = generateOutro(dlugoscOutro, note, metrum, skala, instruments, perkusja)
 
     #debug
     print("Liczba zwrotek " + str(liczbaZwrotek))
@@ -667,15 +782,23 @@ def generatePiece(instruments):
     print("accompaniment "+str(instruments.accompaniment))
     print("second "+str(instruments.second))
     print("solo "+str(instruments.solo))
+    print("\nPerkusja:")
+    if perkusja is None:
+        print("brak")
+    else:
+        print("first "+str(perkusja.first))
+        print("second "+str(perkusja.second))
+        print("third "+str(perkusja.third))
     
-    appendToMidi(intro)
+    appendToMidi(intro, dlugoscIntro*metrum)
     for i in range(liczbaZwrotek):
-        appendToMidi(zwrotka)
+        appendToMidi(zwrotka, dlugoscZwrotka*metrum)
         for j in range(powtorzeniaRefrenu):
-            appendToMidi(refren)
+            appendToMidi(refren, dlugoscRefren*metrum)
         if zwrotkaSolo == i:
-            appendToMidi(solo)
-    appendToMidi(outro)
+            appendToMidi(solo, dlugoscSolo*metrum)
+    appendToMidi(outro, dlugoscOutro*metrum)
+
 
 #losowanie głównych parametrów utworu
 
@@ -695,7 +818,7 @@ instruments=Instrumenty(MyMIDI)
 
 MyMIDI.addTempo(track, time, tempo)
 
-generatePiece(instruments)
+generatePiece(instruments, metrum)
 
 with open("muzyka.mid", "wb") as output_file:
     MyMIDI.writeFile(output_file)
