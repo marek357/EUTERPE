@@ -21,6 +21,115 @@ Dur=1
 Mol=2
 Blues=3
 
+#oznaczenia gatunków
+Other = 1
+Not_Available = 2
+Metal = 3
+Country = 4
+R_B = 5
+Folk = 6
+Rock = 7
+Jazz = 8
+Indie = 9
+Electronic = 10
+Pop = 11
+Hip_Hop = 12
+
+#dostępne gatunki jako listy instrumentów
+
+OtherInstrumenty = list(range(1, 112+1))
+Not_AvailableInstrumenty = list(range(1, 112+1))
+MetalInstrumenty = [31, 32, 34, 35]
+CountryInstrumenty = [4, 21, 26, 41, 42, 106]
+R_BInstrumenty = [8, 33, 34, 84, 89]
+FolkInstrumenty = [4, 13, 16, 22, 23, 41, 42, 46, 48, 76, 78, 107, 108, 109, 110, 112]
+RockInstrumenty = [19, 26, 28, 29, 30, 34, 35, 87]
+JazzInstrumenty = [1, 2, 3, 8, 27, 33, 34, 43, 44, 46, 57, 58]
+IndieInstrumenty = [3, 8, 12, 14, 26, 33, 38, 54, 79]
+ElectronicInstrumenty = [5, 6, 39, 40, 45, 51, 52, 55, 63, 64, 81, 82]
+PopInstrumenty = [5, 6, 26, 28, 29, 33, 49, 50, 81, 87, 89, 90, 96, 97]
+Hip_HopInstrumenty = [33, 34, 84, 98]
+
+
+OtherPerkusja = list(range(35, 81+1))
+Not_AvailablePerkusja = list(range(35, 81+1))
+MetalPerkusja = [37, 38, 40, 43, 44, 45, 46, 47, 49, 51, 57]
+CountryPerkusja = [35, 54, 58, 69]
+R_BPerkusja = [35, 36, 39, 60, 73]
+FolkPerkusja = [41, 48, 50, 53, 54, 56, 58, 60, 61, 69, 70, 73, 80]
+RockPerkusja = [35, 36, 37, 38, 40, 43, 44, 45, 46, 47, 49, 51, 53, 56, 57]
+JazzPerkusja = [35, 51, 55, 57, 59]
+IndiePerkusja = [35, 36, 41, 48, 53, 56, 73, 80]
+ElectronicPerkusja = [39, 40, 45, 47]
+PopPerkusja = [35, 36, 41, 48, 53, 56]
+Hip_HopPerkusja = [35, 36, 39]
+
+#konwersja slowa oznaczającego tonację na int
+def keyToInt(key):
+    res = C
+    if key == 'C':
+        res = C
+    if key == 'Cis':
+        res = Cis
+    if key == 'D':
+        res = D
+    if key == 'Dis':
+        res = Dis
+    if key == 'E':
+        res = E
+    if key == 'F':
+        res = F
+    if key == 'Fis':
+        res = Fis
+    if key == 'G':
+        res = G
+    if key == 'Gis':
+        res = Gis
+    if key == 'A':
+        res = A
+    if key == 'B':
+        res = B
+    if key == 'H':
+        res = H
+    return res
+
+#konwersja slowa oznaczającego skalę na int
+def scaleToInt(scale):
+    res = Dur
+    if scale == 'Dur':
+        res = Dur
+    if scale == 'Mol':
+        res = Mol
+    if scale == 'Blues':
+        res = Blues
+    return res
+
+#konwersja slowa oznaczającego gatunek na int
+def genreToInt(genre):
+    res = Other
+    if genre == 'Other':
+        res = Other
+    if genre == 'Metal':
+        res = Metal
+    if genre == 'Country':
+        res = Country
+    if genre == 'R&B':
+        res = R_B
+    if genre == 'Folk':
+        res = Folk
+    if genre == 'Rock':
+        res = Rock
+    if genre == 'Jazz':
+        res = Jazz
+    if genre == 'Indie':
+        res = Indie
+    if genre == 'Electronic':
+        res = Electronic
+    if genre == 'Pop':
+        res = Pop
+    if genre == 'Hip-Hop':
+        res = Hip_Hop
+    return res
 
 #losowanie długości dźwięku
 def noteLength(sixteenth=10,eight=31,quarter=40,quarterExtended=7,half=9):
@@ -431,13 +540,66 @@ Sound effects:
 127 Applause
 128 Gunshot
 """
+def getInstrumentsForGenre(gatunek):
+    if gatunek == Other:
+        return OtherInstrumenty
+    if gatunek == Not_Available:
+        return Not_AvailableInstrumenty
+    if gatunek == Metal:
+        return MetalInstrumenty
+    if gatunek == Country:
+        return CountryInstrumenty
+    if gatunek == R_B:
+        return R_BInstrumenty
+    if gatunek == Folk:
+        return FolkInstrumenty
+    if gatunek == Rock:
+        return RockInstrumenty
+    if gatunek == Jazz:
+        return JazzInstrumenty
+    if gatunek == Indie:
+        return IndieInstrumenty
+    if gatunek == Electronic:
+        return ElectronicInstrumenty
+    if gatunek == Pop:
+        return PopInstrumenty
+    if gatunek == Hip_Hop:
+        return Hip_HopInstrumenty
+
+def getDrumsForGenre(gatunek):
+    if gatunek == Other:
+        return OtherPerkusja
+    if gatunek == Not_Available:
+        return Not_AvailablePerkusja
+    if gatunek == Metal:
+        return MetalPerkusja
+    if gatunek == Country:
+        return CountryPerkusja
+    if gatunek == R_B:
+        return R_BPerkusja
+    if gatunek == Folk:
+        return FolkPerkusja
+    if gatunek == Rock:
+        return RockPerkusja
+    if gatunek == Jazz:
+        return JazzPerkusja
+    if gatunek == Indie:
+        return IndiePerkusja
+    if gatunek == Electronic:
+        return ElectronicPerkusja
+    if gatunek == Pop:
+        return PopPerkusja
+    if gatunek == Hip_Hop:
+        return Hip_HopPerkusja
+
 class Instrumenty:
     #losuje dowolne instrumenty i przypisuje im kanały w utworze
-    def __init__(this, midiFile, track=0):
-        this.main=random.randint(1,112)
-        this.accompaniment=random.randint(1,112)
-        this.second=random.randint(1,112)
-        this.solo=random.randint(1,112)
+    def __init__(this, midiFile, gatunek=1, track=0):
+        instrumenty = getInstrumentsForGenre(gatunek)
+        this.main= random.choice(instrumenty)
+        this.accompaniment=random.choice(instrumenty)
+        this.second=random.choice(instrumenty)
+        this.solo=random.choice(instrumenty)
         this.mainChan=0
         this.accompanimentChan=1
         this.secondChan=2
@@ -482,6 +644,7 @@ class Instrumenty:
         return random.randint(120,128)
     def getGuitar():
         return random.randint(25,32)
+
 #klasa pozwalająca tworzyć dźwięki do późniejszego dołączenia do głównej części utworu
 class Sound:
     def __init__(this, relTime, channel, note, duration, volume):
@@ -545,11 +708,12 @@ Dostępne instrumenty perkusyjne:
 81 Open Triangle
 """
 class Drums:
-    def __init__(this, metrum):
+    def __init__(this, metrum, gatunek):
+        instrumenty = getDrumsForGenre(gatunek)
         this.metrum=metrum
-        this.first=random.randint(35,81)
-        this.second=random.randint(35,81)
-        this.third=random.randint(35,81)
+        this.first=random.choice(instrumenty)
+        this.second=random.choice(instrumenty)
+        this.third=random.choice(instrumenty)
         this.bit=list()
         this.bit.append(Sound(0,9,this.first,1,120))
         if random.random()<0.9:
@@ -749,14 +913,14 @@ def appendToMidi(piece, pieceDuration):
         MyMIDI.addNote(0,sound.channel, sound.note, sound.relTime+time, sound.duration, sound.volume)
     time+=pieceDuration
 
-def generatePiece(instruments, metrum):
-    skala = Skala(F, Dur)  # skala C-Dur
+def generatePiece(instruments, gatunek, metrum, skala):
     note = Dzwiek(list(skala.gama)[random.randint(0, 6)], random.randint(3, 5)) # losujemy początek ze skali
     #60% szans na pojawienie się perkusji w utworze
-    if random.random()<0.6:
-        perkusja= Drums(metrum)
+    if random.random()<0.7:
+        perkusja= Drums(metrum, gatunek)
     else:
         perkusja=None
+
 
     liczbaZwrotek = random.randint(1, 3)
     powtorzeniaRefrenu = random.randint(1, 2)
@@ -774,6 +938,7 @@ def generatePiece(instruments, metrum):
     outro = generateOutro(dlugoscOutro, note, metrum, skala, instruments, perkusja)
 
     #debug
+    print()
     print("Liczba zwrotek " + str(liczbaZwrotek))
     print("Powtórzenia refrenu " + str(powtorzeniaRefrenu))
     print("Zwrotka po której następuje solo " + str(zwrotkaSolo + 1))
@@ -802,10 +967,40 @@ def generatePiece(instruments, metrum):
 
 #losowanie głównych parametrów utworu
 
+parametry = input('Czy chcesz wybrać parametry utworu (T/N)')
 #tempo
-tempo=random.randint(70, 120)
+if parametry == 'T':
+    tempo = input('Wprowadź tempo od 70 do 120 lub R (domyślne losowanie)')
+    if tempo != 'R':
+        tempo = int(tempo)
+if parametry == 'N' or tempo == 'R':
+    tempo=random.randint(70, 120)
 #metrum, podstawą jest zawsze ćwierćnuta (np. po wylosowaniu 3 metrum to 3/4)
-metrum=random.randint(2,4);
+if parametry == 'T':
+    metrum = input('Wprowadź metrum od 2 do 4 (2/4 - 4/4) lub R (domyślne losowanie)')
+    if metrum != 'R':
+        metrum = int(tempo)
+if parametry == 'N' or metrum == 'R':
+    metrum = random.randint(2, 4);
+#skala
+if parametry == 'T':
+    tonacja = input('Wprowadź tonację (np. Gis) lub R (domyślne losowanie)')
+    tonacja = keyToInt(tonacja)
+if parametry == 'N' or tonacja == 'R':
+    tonacja = random.randint(0, 11);
+if parametry == 'T':
+    rodzajSkali = input('Wproadź rodzaj skali (dostępne Dur, Mol, Blues) lub R (domyślne losowanie)')
+if parametry == 'N' or rodzajSkali == 'R':
+    rodzajSkali = random.choice([Dur, Mol, Blues]);
+
+rodzajSkali = scaleToInt(rodzajSkali)
+skala = Skala(tonacja, rodzajSkali)
+#gatunek
+if parametry == 'T':
+    gatunek = input('Wprowadź gatunek (dostępne Metal, Country, R&B, Folk, Rock, Jazz, Indie, Electronic, Pop, Hip-Hop, Other lub R (domyślne losowanie)')
+    gatunek = genreToInt(gatunek)
+if parametry == 'N' or gatunek == 'R':
+    gatunek = random.randint(1, 12)
 
 track    = 0
 time     = 0   # In beats
@@ -814,11 +1009,11 @@ MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
                      # automatically created)
 
 #tworzenie zestawu instrumentów używanych w piosence
-instruments=Instrumenty(MyMIDI)
+instruments=Instrumenty(MyMIDI, gatunek)
 
 MyMIDI.addTempo(track, time, tempo)
 
-generatePiece(instruments, metrum)
+generatePiece(instruments, gatunek, metrum, skala)
 
 with open("muzyka.mid", "wb") as output_file:
     MyMIDI.writeFile(output_file)
