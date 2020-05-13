@@ -1,5 +1,6 @@
-from muzyka import *
-
+from default import *
+import os.path
+from os import path
 
 class TestDzwiek:
     def test_czy_w_skali_Dur(this):
@@ -60,4 +61,10 @@ class TestAkord:
                 for k in akord.chord:
                     assert k.rodzaj in skala.gama
 
-            
+
+class TestPlik:
+    def test_czy_plik_istnieje(this):
+        assert path.exists('muzyka.mid')
+
+class TestInstrument:
+
