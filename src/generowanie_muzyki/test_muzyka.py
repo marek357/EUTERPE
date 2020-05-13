@@ -1,4 +1,4 @@
-from muzyka import *
+from default import *
 
 
 class TestDzwiek:
