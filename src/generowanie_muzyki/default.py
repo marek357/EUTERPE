@@ -1,57 +1,60 @@
-﻿from midiutil import MIDIFile
-import random
+﻿import random
 import copy
+from midiutil import MIDIFile
+from muzyka import Skala
 
 #oznaczenia rodzajów dźwięków w programie
-C=0
-Cis=1
-D=2
-Dis=3
-E=4
-F=5
-Fis=6
-G=7
-Gis=8
-A=9
-B=10
-H=11
+C = 0
+Cis = 1
+D = 2
+Dis = 3
+E = 4
+F = 5
+Fis = 6
+G = 7
+Gis = 8
+A = 9
+B = 10
+H = 11
 
 #oznaczenia rodzajów skal
-Dur=1
-Mol=2
-Blues=3
+Dur = 1
+Mol = 2
+Blues = 3
 
 #losowanie długości dźwięku
 def noteLength(sixteenth=10,eight=31,quarter=40,quarterExtended=7,half=9):
-    los=random.randint(1,100)
+    los = random.randint(1,100)
     #jedna szesnasta
     if los <= sixteenth:
         return 0.25
     #jedna ósma
-    if los <= sixteenth+eight:
+    if los <= sixteenth + eight:
         return 0.5
     #ćwierć nuta
-    if los <= sixteenth+eight+quarter:
+    if los <= sixteenth + eight + quarter:
         return 1
     #ćwierć nuta z kropką
-    if los <= sixteenth+eight+quarter+quarterExtended:
+    if los <= sixteenth + eight + quarter + quarterExtended:
         return 1.5
     #pół nuta
-    if los <= sixteenth+eight+quarter+quarterExtended+half:
+    if los <= sixteenth + eight + quarter + quarterExtended + half:
         return 2
     #cała nuta
     return 4
 
-#klasa trzyma dźwięk jako rodzaj będący nazwą dźwięku oraz numer oktawy w jakiej się dany dźwięk znajduje
+#klasa trzyma dźwięk jako rodzaj będący nazwą dźwięku oraz numer oktawy w
+#jakiej się dany dźwięk znajduje
 class Dzwiek:
-    #jeśli trzeci argument nie jest podany drugi jest traktowany jako numer midi
+    #jeśli trzeci argument nie jest podany drugi jest traktowany jako numer
+    #midi
     def __init__(this, dzwiek, oktawa=None):
-        if oktawa==None:
-            this.rodzaj=dzwiek%12
-            this.oktawa=dzwiek/12
+        if oktawa == None:
+            this.rodzaj = dzwiek % 12
+            this.oktawa = dzwiek / 12
         else:
-            this.rodzaj=dzwiek
-            this.oktawa=oktawa
+            this.rodzaj = dzwiek
+            this.oktawa = oktawa
 
     ####prywatne metody pomocnicze####
 
@@ -104,12 +107,12 @@ class Dzwiek:
 
     #tworzy kopię obiektu
     def copy(this):
-        nowy=Dzwiek(this.rodzaj,this.oktawa)
+        nowy = Dzwiek(this.rodzaj,this.oktawa)
         return nowy
 
     #zamienia dźwięk na numer midi
     def toMidi(this):
-        return 12*(this.oktawa+1)+this.rodzaj
+        return 12 * (this.oktawa + 1) + this.rodzaj
 
     #podwyższa dźwięk o jeden do góry po skali
     def noteUp(this, skala):
@@ -118,7 +121,7 @@ class Dzwiek:
             this.oktawa += 1
             this.rodzaj = skala.gama[0]
         else:
-            this.rodzaj = skala.gama[idx+1]
+            this.rodzaj = skala.gama[idx + 1]
         return this
 
     #obniża dźwięk o jeden w dół po skali
@@ -133,18 +136,18 @@ class Dzwiek:
 
     #podwyższa wysokość dźwięku o [ile] półtonów
     def next(this, ile=1):
-        temp=this.rodzaj
-        this.rodzaj+=ile%12
+        temp = this.rodzaj
+        this.rodzaj+=ile % 12
         this.rodzaj%=12
-        this.oktawa+=ile//12 + 1 if this.rodzaj<temp else 0
+        this.oktawa+=ile // 12 + 1 if this.rodzaj < temp else 0
         return this
 
     #obniża wysokość dźwięku o [ile] półtonów
     def prev(this, ile=1):
-        temp=this.rodzaj
-        this.rodzaj-=ile%12
+        temp = this.rodzaj
+        this.rodzaj-=ile % 12
         this.rodzaj%=12
-        this.oktawa-=ile//12 + 1 if this.rodzaj>temp else 0
+        this.oktawa-=ile // 12 + 1 if this.rodzaj > temp else 0
         return this
 
     #zmiana na kolejny dźwięk na podstawie obecnego
@@ -181,20 +184,22 @@ class Dzwiek:
 
 #klara obsługuje operacje na akordach
 class Akord:
-    #tworzy akord z podanym dźwiękiem jako bazą, dostosowuje tercje tak aby należała do podanej skali
+    #tworzy akord z podanym dźwiękiem jako bazą, dostosowuje tercje tak aby
+    #należała do podanej skali
     def __init__(this, dzwiek, skala):
-        d=dzwiek.copy()
-        this.chord=[d.copy(),d.copy().noteUp(skala).noteUp(skala),d.copy().noteUp(skala).noteUp(skala).noteUp(skala).noteUp(skala)]
-        this.podstawa=dzwiek.rodzaj
+        d = dzwiek.copy()
+        this.chord = [d.copy(),d.copy().noteUp(skala).noteUp(skala),d.copy().noteUp(skala).noteUp(skala).noteUp(skala).noteUp(skala)]
+        this.podstawa = dzwiek.rodzaj
     
     #tworzy kopię obiektu
     def copy(this):
         return copy.deepcopy(this)
 
-    #tworzy kolejne przewroty akordu n razy, TODO: dla n>1 można zrobić optymalniej, dodać obsługę n<0
+    #tworzy kolejne przewroty akordu n razy, TODO: dla n>1 można zrobić
+    #optymalniej, dodać obsługę n<0
     def transpose(this, n=1):
         for i in range(n):
-            d=this.chord.pop(0)
+            d = this.chord.pop(0)
             d.oktawa+=1
             this.chord.append(d)
         return this
@@ -211,7 +216,8 @@ class Akord:
             x.oktawa+=n
         return this
     
-    #modyfikuje losowo akord, TODO: trzeba by sprawdzić jakie procenty będą sensowne i dorobić więcej możliwości zmian
+    #modyfikuje losowo akord, TODO: trzeba by sprawdzić jakie procenty będą
+    #sensowne i dorobić więcej możliwości zmian
     def variate(this):
         this.transpose(random.randint(0,2))
         this.octaveDown(random.randint(0,1))
@@ -384,38 +390,38 @@ Sound effects:
 class Instrumenty:
     #losuje dowolne instrumenty i przypisuje im kanały w utworze
     def __init__(this, midiFile, instrumenty, track=0):
-        this.main= random.choice(instrumenty)
-        this.accompaniment=random.choice(instrumenty)
-        this.second=random.choice(instrumenty)
-        this.solo=random.choice(instrumenty)
-        this.mainChan=0
-        this.accompanimentChan=1
-        this.secondChan=2
-        this.soloChan=3
-        this.midi=midiFile
-        midiFile.addProgramChange(track, this.mainChan, 0, this.main-1)
-        midiFile.addProgramChange(track, this.accompanimentChan, 0, this.accompaniment-1)
-        midiFile.addProgramChange(track, this.secondChan, 0, this.second-1)
-        midiFile.addProgramChange(track, this.soloChan, 0, this.solo-1)
+        this.main = random.choice(instrumenty) - 1
+        this.accompaniment = random.choice(instrumenty) - 1
+        this.second = random.choice(instrumenty) - 1
+        this.solo = random.choice(instrumenty) - 1
+        this.mainChan = 0
+        this.accompanimentChan = 1
+        this.secondChan = 2
+        this.soloChan = 3
+        this.midi = midiFile
+        midiFile.addProgramChange(track, this.mainChan, 0, this.main)
+        midiFile.addProgramChange(track, this.accompanimentChan, 0, this.accompaniment)
+        midiFile.addProgramChange(track, this.secondChan, 0, this.second)
+        midiFile.addProgramChange(track, this.soloChan, 0, this.solo)
     #ustawia główny instrument
-    def setMain(this, instrument, time=0):
-        this.main=instrument-1
-        midi.addProgramChange(track, mainChan, time, main)
+    def setMain(this, instrument, time=0, track=0):
+        this.main = instrument - 1
+        this.midi.addProgramChange(track, this.mainChan, time, this.main)
     #ustawia instrument używany w akompaniamencie
     def setAccompaniment(this, instrument, time=0, track=0):
-        this.accompaniment=instrument-1
-        midi.addProgramChange(track, accompanimentChan, time, accompaniment)
+        this.accompaniment = instrument - 1
+        this.midi.addProgramChange(track, this.accompanimentChan, time, this.accompaniment)
     #ustawia dodatkowy instrument
     def setSecond(this, instrument, time=0, track=0):
-        this.second=instrument-1
-        this.midi.addProgramChange(track, secondChan, time, second)
+        this.second = instrument - 1
+        this.midi.addProgramChange(track, this.secondChan, time, this.second)
     #ustawia instrument solowy
     def setsolo(this, instrument, time=0, track=0):
-        this.solo=instrument-1
-        this.midi.addProgramChange(track, soloChan, time, solo)
+        this.solo = instrument - 1
+        this.midi.addProgramChange(track, this.soloChan, time, this.solo)
     #ustawia dowolny instrumnt na wybranym kanale
     def setInstrument(this, instrument, channel, time=0, track=0):
-        this.midi.addProgramChange(track, channel, time, instrument-1)
+        this.midi.addProgramChange(track, channel, time, instrument - 1)
 
     #metody zwracające numery kanałów odpowiednich instrumentów
     def getMain(this):
@@ -428,19 +434,20 @@ class Instrumenty:
         return this.soloChan
 
     #metody zwracające numery instrumentów z różnych grup
-    def getSoundEffect():
+    def getSoundEffect(this):
         return random.randint(120,128)
-    def getGuitar():
+    def getGuitar(this):
         return random.randint(25,32)
 
-#klasa pozwalająca tworzyć dźwięki do późniejszego dołączenia do głównej części utworu
+#klasa pozwalająca tworzyć dźwięki do późniejszego dołączenia do głównej części
+#utworu
 class Sound:
     def __init__(this, relTime, channel, note, duration, volume):
-        this.relTime=relTime
-        this.channel=channel
-        this.note=note
-        this.duration=duration
-        this.volume=volume
+        this.relTime = relTime
+        this.channel = channel
+        this.note = note
+        this.duration = duration
+        this.volume = volume
 
 """
 Klasa tworząca losowy bit perkusyjny wykorzysywany w utworze. 
@@ -496,55 +503,56 @@ Dostępne instrumenty perkusyjne:
 81 Open Triangle
 """
 class Drums:
-    def __init__(this, metrum, instrumenty=list(range(35, 81+1))):
-        this.metrum=metrum
-        this.first=random.choice(instrumenty)
-        this.second=random.choice(instrumenty)
-        this.third=random.choice(instrumenty)
-        this.bit=list()
+    def __init__(this, metrum, instrumenty=list(range(35, 81 + 1))):
+        this.metrum = metrum
+        this.first = random.choice(instrumenty)
+        this.second = random.choice(instrumenty)
+        this.third = random.choice(instrumenty)
+        this.bit = list()
         this.bit.append(Sound(0,9,this.first,1,120))
-        if random.random()<0.9:
+        if random.random() < 0.9:
             for i in range(metrum):
                 this.bit.append(Sound(i,9,this.second,1,100))
-        if random.random()<0.8:
-            if(metrum==3):
+        if random.random() < 0.8:
+            if(metrum == 3):
                 this.bit.append(Sound(1,9,this.third,1,100))
                 this.bit.append(Sound(2,9,this.third,1,100))
-            if(metrum==2):
+            if(metrum == 2):
                 this.bit.append(Sound(1,9,this.third,1,100))
-            if(metrum==4):
+            if(metrum == 4):
                 this.bit.append(Sound(2,9,this.third,1,100))
 
 class Piece:
-    def __init__(this, metrum, skala, tempo, instruments=list(range(1,112+1)), drums=list(range(35, 81+1))):
-        this.track= 0
-        this.time= 0   # In beats
-        this.skala=skala
-        this.tempo=tempo
-        this.metrum=metrum
+    def __init__(this, metrum, skala, tempo, instruments=list(range(1,112 + 1)), drums=list(range(35, 81 + 1))):
+        this.track = 0
+        this.time = 0   # In beats
+        this.skala = skala
+        this.tempo = tempo
+        this.metrum = metrum
         this.MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
                              # automatically created)
         #tworzenie zestawu instrumentów używanych w piosence
-        this.instruments=Instrumenty(this.MyMIDI, instruments)
+        this.instruments = Instrumenty(this.MyMIDI, instruments)
         #70% szans na pojawienie się perkusji w utworze
-        if random.random()<0.7:
-            this.perkusja= Drums(metrum, drums)
+        if random.random() < 0.7:
+            this.perkusja = Drums(metrum, drums)
         else:
-            this.perkusja=None
+            this.perkusja = None
         this.MyMIDI.addTempo(this.track, this.time, tempo)
-
+    #generuje piosenkę z parametrami ustawionymi podczas tworzenie obiektu i zapisuje ją w pliku muzyka.mid
     def generatePiece(this):
-        note = Dzwiek(list(this.skala.gama)[random.randint(0, 6)], random.randint(3, 5)) # losujemy początek ze skali
+        # losujemy początek ze skali
+        note = Dzwiek(list(this.skala.gama)[random.randint(0, 6)], random.randint(3, 5))
 
         liczbaZwrotek = random.randint(1, 3)
         powtorzeniaRefrenu = random.randint(1, 2)
-        zwrotkaSolo = random.randint(-1, liczbaZwrotek-1)
+        zwrotkaSolo = random.randint(-1, liczbaZwrotek - 1)
 
-        dlugoscIntro=random.randint(4, 6)
-        dlugoscZwrotka=random.randint(8, 16)
-        dlugoscRefren=random.randint(6, 12)
-        dlugoscSolo=random.randint(8, 16)
-        dlugoscOutro=random.randint(4, 8)
+        dlugoscIntro = random.randint(4, 6)
+        dlugoscZwrotka = random.randint(8, 16)
+        dlugoscRefren = random.randint(6, 12)
+        dlugoscSolo = random.randint(8, 16)
+        dlugoscOutro = random.randint(4, 8)
         intro = this.generateIntro(dlugoscIntro, note, this.metrum, this.skala, this.instruments, this.perkusja)
         zwrotka = this.generateVerse(dlugoscZwrotka, note, this.metrum, this.skala, this.instruments, this.perkusja)
         refren = this.generateChorus(dlugoscRefren, note, this.metrum, this.skala, this.instruments, this.perkusja)
@@ -557,36 +565,36 @@ class Piece:
         print("Powtórzenia refrenu " + str(powtorzeniaRefrenu))
         print("Zwrotka po której następuje solo " + str(zwrotkaSolo + 1))
         print("\nInstrumenty:")
-        print("main "+str(this.instruments.main))
-        print("accompaniment "+str(this.instruments.accompaniment))
-        print("second "+str(this.instruments.second))
-        print("solo "+str(this.instruments.solo))
+        print("main " + str(this.instruments.main))
+        print("accompaniment " + str(this.instruments.accompaniment))
+        print("second " + str(this.instruments.second))
+        print("solo " + str(this.instruments.solo))
         print("\nPerkusja:")
         if this.perkusja is None:
             print("brak")
         else:
-            print("first "+str(this.perkusja.first))
-            print("second "+str(this.perkusja.second))
-            print("third "+str(this.perkusja.third))
+            print("first " + str(this.perkusja.first))
+            print("second " + str(this.perkusja.second))
+            print("third " + str(this.perkusja.third))
     
-        this._appendToMidi(intro, dlugoscIntro*this.metrum)
+        this._appendToMidi(intro, dlugoscIntro * this.metrum)
         for i in range(liczbaZwrotek):
-            this._appendToMidi(zwrotka, dlugoscZwrotka*this.metrum)
+            this._appendToMidi(zwrotka, dlugoscZwrotka * this.metrum)
             for j in range(powtorzeniaRefrenu):
-                this._appendToMidi(refren, dlugoscRefren*this.metrum)
+                this._appendToMidi(refren, dlugoscRefren * this.metrum)
             if zwrotkaSolo == i:
-                this._appendToMidi(solo, dlugoscSolo*this.metrum)
-        this._appendToMidi(outro, dlugoscOutro*this.metrum)
+                this._appendToMidi(solo, dlugoscSolo * this.metrum)
+        this._appendToMidi(outro, dlugoscOutro * this.metrum)
         #zapisywanie wygenerowanej muzyki
         with open("muzyka.mid", "wb") as output_file:
             this.MyMIDI.writeFile(output_file)
 
-
+    #dołącza dźwięki wchodzące w skład podanego fragmentu utworu jako kolejną sekscję w obiekcie midi
     def _appendToMidi(this, piece, pieceDuration):
         for sound in piece:
-            this.MyMIDI.addNote(0,sound.channel, sound.note, sound.relTime+this.time, sound.duration, sound.volume)
+            this.MyMIDI.addNote(0,sound.channel, sound.note, sound.relTime + this.time, sound.duration, sound.volume)
         this.time+=pieceDuration
-
+    #generuje intro do utworu
     def generateIntro(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
         relative_time = 0
@@ -595,8 +603,8 @@ class Piece:
         if perkusja is not None:
             for i in range(nOfMeasures):
                 for j in perkusja.bit:
-                    if j.note==perkusja.first:
-                        piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+                    if j.note == perkusja.first:
+                        piece.append(Sound(j.relTime + i * metrum,j.channel,j.note,j.duration,j.volume))
 
         while relative_time < nOfMeasures * metrum:
             duration = noteLength(2,25)
@@ -607,9 +615,9 @@ class Piece:
                 duration = metrum - relative_time % metrum
             # akcenty i akompaniament
             if (relative_time % metrum) == 0:
-                if (relative_time==0 or relative_time==metrum):
+                if (relative_time == 0 or relative_time == metrum):
                     #na początku utworu początkowe akordy mogą zostać pominięte
-                    if(random.random()<0.3):
+                    if(random.random() < 0.3):
                         # tworzy akord z aktualnie granego dźwięku
                         akord = Akord(note, skala)
                         for x in akord.chord:
@@ -622,7 +630,7 @@ class Piece:
             piece.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
             relative_time = relative_time + duration
         return piece
-
+    #generuje zwrotkę utworu
     def generateVerse(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
         relative_time = 0
@@ -631,7 +639,7 @@ class Piece:
         if perkusja is not None:
             for i in range(nOfMeasures):
                 for j in perkusja.bit:
-                    piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+                    piece.append(Sound(j.relTime + i * metrum,j.channel,j.note,j.duration,j.volume))
 
         while relative_time < nOfMeasures * metrum:
             duration = noteLength()
@@ -653,7 +661,7 @@ class Piece:
             piece.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
             relative_time = relative_time + duration
         return piece
-
+    #generuje refren utworu
     def generateChorus(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
         relative_time = 0
@@ -662,13 +670,13 @@ class Piece:
         if perkusja is not None:
             for i in range(nOfMeasures):
                 for j in perkusja.bit:
-                    piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+                    piece.append(Sound(j.relTime + i * metrum, j.channel, j.note, j.duration, j.volume))
 
         #w refrenie do grania melodii może być wybrany instrument pomocniczy
-        if random.random()<0.4:
-            instrument=instruments.getMain()
+        if random.random() < 0.4:
+            instrument = instruments.getMain()
         else:
-            instrument=instruments.getSecond()
+            instrument = instruments.getSecond()
         while relative_time < nOfMeasures * metrum:
             duration = noteLength()
             note = note.nextNote(skala)
@@ -690,7 +698,7 @@ class Piece:
             piece.append(Sound(relative_time, instrument, note.toMidi(), duration, volume))
             relative_time = relative_time + duration
         return piece
-
+    #generuje zakończenie utworu
     def generateOutro(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
         relative_time = 0
@@ -699,8 +707,8 @@ class Piece:
         if perkusja is not None:
             for i in range(nOfMeasures):
                 for j in perkusja.bit:
-                    if j.note==perkusja.first:
-                        piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+                    if j.note == perkusja.first:
+                        piece.append(Sound(j.relTime + i * metrum, j.channel, j.note, j.duration, j.volume))
 
         while relative_time < nOfMeasures * metrum:
             duration = noteLength(2,20)
@@ -724,6 +732,7 @@ class Piece:
             relative_time = relative_time + duration
         return piece
 
+    #generuje fragment w utworze przeznaczony na solo
     def generateSolo(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
         relative_time = 0
@@ -732,13 +741,13 @@ class Piece:
         if perkusja is not None:
             for i in range(nOfMeasures):
                 for j in perkusja.bit:
-                    if j.note==perkusja.first or j.note==perkusja.third:
-                        piece.append(Sound(j.relTime+i*metrum,j.channel,j.note,j.duration,j.volume))
+                    if j.note == perkusja.first or j.note == perkusja.third:
+                        piece.append(Sound(j.relTime + i * metrum, j.channel, j.note, j.duration, j.volume))
 
-        if random.random()<0.8:
-            instrument=instruments.getSolo()
+        if random.random() < 0.8:
+            instrument = instruments.getSolo()
         else:
-            instrument=instruments.getMain()
+            instrument = instruments.getMain()
 
         while relative_time < nOfMeasures * metrum:
             duration = noteLength(40,35,15,7,3)
@@ -750,10 +759,10 @@ class Piece:
             # akcenty i akompaniament
             if (relative_time % metrum) == 0:
                 # tworzy akord z aktualnie granego dźwięku
-                if (relative_time==0):
+                if (relative_time == 0):
                     akord = Akord(note, skala)
                     for x in akord.chord:
-                        piece.append(Sound(relative_time, instruments.getAccompaniment(), x.toMidi(), 2*metrum, 70))
+                        piece.append(Sound(relative_time, instruments.getAccompaniment(), x.toMidi(), 2 * metrum, 70))
                 # uwydatnianie akcentu głośnością
                 volume = 120
             else:

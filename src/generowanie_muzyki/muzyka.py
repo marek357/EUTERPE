@@ -1,25 +1,24 @@
-from midiutil import MIDIFile
 import random
 import copy
 
 #oznaczenia rodzajów dźwięków w programie
-C=0
-Cis=1
-D=2
-Dis=3
-E=4
-F=5
-Fis=6
-G=7
-Gis=8
-A=9
-B=10
-H=11
+C = 0
+Cis = 1
+D = 2
+Dis = 3
+E = 4
+F = 5
+Fis = 6
+G = 7
+Gis = 8
+A = 9
+B = 10
+H = 11
 
 #oznaczenia rodzajów skal
-Dur=1
-Mol=2
-Blues=3
+Dur = 1
+Mol = 2
+Blues = 3
 
 #oznaczenia gatunków
 Other = 1
@@ -37,6 +36,7 @@ Hip_Hop = 12
 
 #funkcje generujące skale
 
+#generuje skalę durową
 def generateMajorScale(key):
     curr = key
     scale = list()
@@ -61,14 +61,14 @@ def generateMinorScale(key):
             curr = curr + 2
         curr = curr % (H + 1)
     return tuple(scale)
-
+#generuje skalę bluesową
 def generateBluesScale(key):
     scale = list(generateMajorScale(key))
     scale[2] = (scale[2] + H) % (H + 1)
     scale[4] = (scale[4] + H) % (H + 1)
     scale[6] = (scale[6] + H) % (H + 1)
     return tuple(scale)
-
+#w zależności od parametrów generuje skalę Durową, Molową lub Bluesową
 def generateScale(key, type):
     key = key % (H + 1)
     if type == Dur:
@@ -86,9 +86,8 @@ class Skala:
         this.gama = generateScale(key, type)
 
 #dostępne gatunki jako listy instrumentów
-
-OtherInstrumenty = list(range(1, 112+1))
-Not_AvailableInstrumenty = list(range(1, 112+1))
+OtherInstrumenty = list(range(1, 112 + 1))
+Not_AvailableInstrumenty = list(range(1, 112 + 1))
 MetalInstrumenty = [31, 32, 34, 35]
 CountryInstrumenty = [4, 21, 26, 41, 42, 106]
 R_BInstrumenty = [8, 33, 34, 84, 89]
@@ -101,8 +100,8 @@ PopInstrumenty = [5, 6, 26, 28, 29, 33, 49, 50, 81, 87, 89, 90, 96, 97]
 Hip_HopInstrumenty = [33, 34, 84, 98]
 
 
-OtherPerkusja = list(range(35, 81+1))
-Not_AvailablePerkusja = list(range(35, 81+1))
+OtherPerkusja = list(range(35, 81 + 1))
+Not_AvailablePerkusja = list(range(35, 81 + 1))
 MetalPerkusja = [37, 38, 40, 43, 44, 45, 46, 47, 49, 51, 57]
 CountryPerkusja = [35, 54, 58, 69]
 R_BPerkusja = [35, 36, 39, 60, 73]
@@ -237,7 +236,7 @@ def getDrumsForGenre(gatunek):
     if gatunek == Hip_Hop:
         return Hip_HopPerkusja
 
-if __name__=="__main__":
+if __name__ == "__main__":
     #losowanie głównych parametrów utworu
     parametry = input('Czy chcesz wybrać parametry utworu (T/N)')
     #tempo
@@ -246,56 +245,58 @@ if __name__=="__main__":
         if tempo != 'R':
             tempo = int(tempo)
     if parametry == 'N' or tempo == 'R':
-        tempo=random.randint(70, 120)
-    #metrum, podstawą jest zawsze ćwierćnuta (np. po wylosowaniu 3 metrum to 3/4)
+        tempo = random.randint(70, 120)
+    #metrum, podstawą jest zawsze ćwierćnuta (np.  po wylosowaniu 3 metrum to
+    #3/4)
     if parametry == 'T':
         metrum = input('Wprowadź metrum od 2 do 4 (2/4 - 4/4) lub R (domyślne losowanie)')
         if metrum != 'R':
             metrum = int(tempo)
     if parametry == 'N' or metrum == 'R':
-        metrum = random.randint(2, 4);
+        metrum = random.randint(2, 4)
     #skala
     if parametry == 'T':
         tonacja = input('Wprowadź tonację (np. Gis) lub R (domyślne losowanie)')
         tonacja = keyToInt(tonacja)
     if parametry == 'N' or tonacja == 'R':
-        tonacja = random.randint(0, 11);
+        tonacja = random.randint(0, 11)
     if parametry == 'T':
         rodzajSkali = input('Wproadź rodzaj skali (dostępne Dur, Mol, Blues) lub R (domyślne losowanie)')
     if parametry == 'N' or rodzajSkali == 'R':
-        rodzajSkali = random.choice([Dur, Mol, Blues]);
+        rodzajSkali = random.choice([Dur, Mol, Blues])
 
     rodzajSkali = scaleToInt(rodzajSkali)
     skala = Skala(tonacja, rodzajSkali)
     #gatunek
     if parametry == 'T':
-        gatunek = input('Wprowadź gatunek (dostępne Metal, Country, R&B, Folk, Rock, Jazz, Indie, Electronic, Pop, Hip-Hop lub R (domyślne losowanie)')
-        gatunek=genreToInt(gatunek)
+        gatunek = input('''Wprowadź gatunek (dostępne Metal, Country, R&B, Folk, 
+        Rock, Jazz, Indie, Electronic, Pop, Hip-Hop lub R (domyślne losowanie)''')
+        gatunek = genreToInt(gatunek)
     if parametry == 'N' or gatunek == 'R':
         gatunek = random.randint(3, 12)
     if parametry == 'T':
-        if gatunek==Metal:
+        if gatunek == Metal:
             from metal import PieceMetal as Piece
-        elif gatunek==Country:
+        elif gatunek == Country:
             from country import PieceCountry as Piece
-        elif gatunek==R_B:
+        elif gatunek == R_B:
             from R_B import PieceRB as Piece
-        elif gatunek==Folk:
+        elif gatunek == Folk:
             from folk import PieceFolk as Piece
-        elif gatunek==Rock:
+        elif gatunek == Rock:
             from rock import PieceRock as Piece
-        elif gatunek==Jazz:
+        elif gatunek == Jazz:
             from jazz import PieceJazz as Piece
-        elif gatunek==Indie:
+        elif gatunek == Indie:
             from indie import PieceIndie as Piece
-        elif gatunek==Electronic:
-            from eletronic import PieceElectronic as Piece
-        elif gatunek==Pop:
+        elif gatunek == Electronic:
+            from electronic import PieceElectronic as Piece
+        elif gatunek == Pop:
             from pop import PiecePop as Piece
-        elif gatunek==Hip_Hop:
+        elif gatunek == Hip_Hop:
             from hip_hop import PieceHipHop as Piece
     else:
         from default import Piece
 
-    muzyka=Piece(metrum,skala,tempo)
+    muzyka = Piece(metrum, skala, tempo)
     muzyka.generatePiece()
