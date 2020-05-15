@@ -561,7 +561,11 @@ class Piece:
 
         #debug
         print()
-        print("Liczba zwrotek " + str(liczbaZwrotek))
+        print("metrum "+str(this.metrum))
+        print("tempo "+str(this.tempo))
+        print("liczba taktów "+str(dlugoscIntro+
+            liczbaZwrotek*(dlugoscZwrotka+powtorzeniaRefrenu*dlugoscRefren)+(dlugoscSolo if zwrotkaSolo!=-1 else 0)+dlugoscOutro))
+        print("\nLiczba zwrotek " + str(liczbaZwrotek))
         print("Powtórzenia refrenu " + str(powtorzeniaRefrenu))
         print("Zwrotka po której następuje solo " + str(zwrotkaSolo + 1))
         print("\nInstrumenty:")
@@ -711,7 +715,7 @@ class Piece:
                         piece.append(Sound(j.relTime + i * metrum, j.channel, j.note, j.duration, j.volume))
 
         while relative_time < nOfMeasures * metrum:
-            duration = noteLength(2,20)
+            duration = noteLength(2,10,15,20,30)
             note = note.nextNote(skala)
             note.normalize()
             # na początku każdego nowego taktu powinien być nowy dźwięk

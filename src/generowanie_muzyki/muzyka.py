@@ -251,7 +251,7 @@ if __name__ == "__main__":
     if parametry == 'T':
         metrum = input('Wprowadź metrum od 2 do 4 (2/4 - 4/4) lub R (domyślne losowanie)')
         if metrum != 'R':
-            metrum = int(tempo)
+            metrum = int(metrum)
     if parametry == 'N' or metrum == 'R':
         metrum = random.randint(2, 4)
     #skala
@@ -271,10 +271,14 @@ if __name__ == "__main__":
     if parametry == 'T':
         gatunek = input('''Wprowadź gatunek (dostępne Metal, Country, R&B, Folk, 
         Rock, Jazz, Indie, Electronic, Pop, Hip-Hop lub R (domyślne losowanie)''')
-        gatunek = genreToInt(gatunek)
-    if parametry == 'N' or gatunek == 'R':
-        gatunek = random.randint(3, 12)
+          
     if parametry == 'T':
+        #losowanie gatunku
+        if gatunek == 'R':
+            gatunek = random.randint(3, 12)
+        else:
+            gatunek = genreToInt(gatunek)
+        #importowanie wybranego gatunku
         if gatunek == Metal:
             from metal import PieceMetal as Piece
         elif gatunek == Country:
