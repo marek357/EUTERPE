@@ -524,6 +524,7 @@ class Piece:
         this.metrum=metrum
         this.MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
                              # automatically created)
+        this.vocalMIDI = MIDIFile(1)
         #tworzenie zestawu instrumentów używanych w piosence
         this.instruments=Instrumenty(this.MyMIDI, instruments)
         #70% szans na pojawienie się perkusji w utworze
@@ -580,15 +581,20 @@ class Piece:
         #zapisywanie wygenerowanej muzyki
         with open("muzyka.mid", "wb") as output_file:
             this.MyMIDI.writeFile(output_file)
+        with open("wokal.mid", "wb") as output_file:
+            this.vocalMIDI.writeFile(output_file)
 
 
     def _appendToMidi(this, piece, pieceDuration):
-        for sound in piece:
+        for sound in piece[0]:
             this.MyMIDI.addNote(0,sound.channel, sound.note, sound.relTime+this.time, sound.duration, sound.volume)
+        for sound in piece[1]:
+            this.vocalMIDI.addNote(0, sound.channel, sound.note, sound.relTime + this.time, sound.duration, sound.volume)
         this.time+=pieceDuration
 
     def generateIntro(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
+        vocal = list()
         relative_time = 0
 
         #generacja dźwięków perkusji
@@ -621,10 +627,11 @@ class Piece:
 
             piece.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
             relative_time = relative_time + duration
-        return piece
+        return (piece, vocal)
 
     def generateVerse(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
+        vocal = list()
         relative_time = 0
 
         #generacja dźwięków perkusji
@@ -651,11 +658,13 @@ class Piece:
                 volume = 80
 
             piece.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
+            vocal.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
             relative_time = relative_time + duration
-        return piece
+        return (piece, vocal)
 
     def generateChorus(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
+        vocal = list()
         relative_time = 0
 
         #generacja dźwięków perkusji
@@ -688,11 +697,13 @@ class Piece:
                 volume = 100
 
             piece.append(Sound(relative_time, instrument, note.toMidi(), duration, volume))
+            vocal.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
             relative_time = relative_time + duration
-        return piece
+        return (piece, vocal)
 
     def generateOutro(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
+        vocal = list()
         relative_time = 0
 
         #generacja dźwięków perkusji
@@ -722,10 +733,11 @@ class Piece:
 
             piece.append(Sound(relative_time, instruments.getMain(), note.toMidi(), duration, volume))
             relative_time = relative_time + duration
-        return piece
+        return (piece, vocal)
 
     def generateSolo(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
         piece = list()
+        vocal = list()
         relative_time = 0
 
         #generacja dźwięków perkusji
@@ -761,4 +773,4 @@ class Piece:
 
             piece.append(Sound(relative_time, instrument, note.toMidi(), duration, volume))
             relative_time = relative_time + duration
-        return piece
+        return (piece, vocal)

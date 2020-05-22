@@ -289,7 +289,7 @@ if __name__=="__main__":
         elif gatunek==Indie:
             from indie import PieceIndie as Piece
         elif gatunek==Electronic:
-            from eletronic import PieceElectronic as Piece
+            from electronic import PieceElectronic as Piece
         elif gatunek==Pop:
             from pop import PiecePop as Piece
         elif gatunek==Hip_Hop:

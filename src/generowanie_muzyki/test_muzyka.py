@@ -65,6 +65,3 @@ class TestAkord:
 class TestPlik:
     def test_czy_plik_istnieje(this):
         assert path.exists('muzyka.mid')
-
-class TestInstrument:
-
