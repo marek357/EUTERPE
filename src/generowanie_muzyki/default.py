@@ -172,10 +172,10 @@ class Dzwiek:
 
     #kontrola zbyt wysokich/niskich dzwiekow
     def normalize(self):
-        if self.oktawa <= 2:
-            self.oktawa = 2
-        if self.oktawa >= 6:
-            self.oktawa = 6
+        if self.oktawa <= 3:
+            self.oktawa = 3
+        if self.oktawa >= 5:
+            self.oktawa = 5
 
 
 
@@ -533,6 +533,8 @@ class Piece:
 
         this.muzykaTrack.append(MetaMessage('set_tempo', tempo=bpm2tempo(this.tempo)))
         this.wokalTrack.append(MetaMessage('set_tempo', tempo=bpm2tempo(this.tempo)))
+
+        this.wokalTrack.append(Message('program_change', program=12))
 
         #tworzenie zestawu instrumentów używanych w piosence
         this.instruments=Instrumenty(this.muzykaTrack, instruments)
