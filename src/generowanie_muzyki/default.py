@@ -1,6 +1,7 @@
 ﻿from midiutil import MIDIFile
 import random
 import copy
+from mido import Message, MetaMessage, MidiFile, MidiTrack, bpm2tempo
 
 #oznaczenia rodzajów dźwięków w programie
 C=0
@@ -383,7 +384,7 @@ Sound effects:
 """
 class Instrumenty:
     #losuje dowolne instrumenty i przypisuje im kanały w utworze
-    def __init__(this, midiFile, instrumenty, track=0):
+    def __init__(this, midiTrack, instrumenty, track=0):
         this.main= random.choice(instrumenty)
         this.accompaniment=random.choice(instrumenty)
         this.second=random.choice(instrumenty)
@@ -392,30 +393,30 @@ class Instrumenty:
         this.accompanimentChan=1
         this.secondChan=2
         this.soloChan=3
-        this.midi=midiFile
-        midiFile.addProgramChange(track, this.mainChan, 0, this.main-1)
-        midiFile.addProgramChange(track, this.accompanimentChan, 0, this.accompaniment-1)
-        midiFile.addProgramChange(track, this.secondChan, 0, this.second-1)
-        midiFile.addProgramChange(track, this.soloChan, 0, this.solo-1)
+        this.midi=midiTrack
+        midiTrack.append(Message('program_change', channel=this.mainChan, program=this.main-1))
+        midiTrack.append(Message('program_change', channel=this.accompanimentChan, program=this.accompaniment - 1))
+        midiTrack.append(Message('program_change', channel=this.secondChan, program=this.second - 1))
+        midiTrack.append(Message('program_change', channel=this.soloChan, program=this.solo - 1))
     #ustawia główny instrument
     def setMain(this, instrument, time=0):
         this.main=instrument-1
-        midi.addProgramChange(track, mainChan, time, main)
+        this.midi.append(Message('program_change', channel=this.mainChan, program=this.main))
     #ustawia instrument używany w akompaniamencie
     def setAccompaniment(this, instrument, time=0, track=0):
         this.accompaniment=instrument-1
-        midi.addProgramChange(track, accompanimentChan, time, accompaniment)
+        this.midi.append(Message('program_change', channel=this.accompanimentChan, program=this.accompaniment))
     #ustawia dodatkowy instrument
     def setSecond(this, instrument, time=0, track=0):
         this.second=instrument-1
-        this.midi.addProgramChange(track, secondChan, time, second)
+        this.midi.append(Message('program_change', channel=this.secondChan, program=this.second))
     #ustawia instrument solowy
     def setsolo(this, instrument, time=0, track=0):
         this.solo=instrument-1
-        this.midi.addProgramChange(track, soloChan, time, solo)
+        this.midi.append(Message('program_change', channel=this.soloChan, program=this.solo))
     #ustawia dowolny instrumnt na wybranym kanale
     def setInstrument(this, instrument, channel, time=0, track=0):
-        this.midi.addProgramChange(track, channel, time, instrument-1)
+        this.midi.append(Message('program_change', channel=channel, program=instrument-1))
 
     #metody zwracające numery kanałów odpowiednich instrumentów
     def getMain(this):
@@ -428,9 +429,9 @@ class Instrumenty:
         return this.soloChan
 
     #metody zwracające numery instrumentów z różnych grup
-    def getSoundEffect():
+    def getSoundEffect(self):
         return random.randint(120,128)
-    def getGuitar():
+    def getGuitar(self):
         return random.randint(25,32)
 
 #klasa pozwalająca tworzyć dźwięki do późniejszego dołączenia do głównej części utworu
@@ -522,17 +523,24 @@ class Piece:
         this.skala=skala
         this.tempo=tempo
         this.metrum=metrum
-        this.MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
-                             # automatically created)
-        this.vocalMIDI = MIDIFile(1)
+        this.muzyka = MidiFile(type=0)
+        this.wokal = MidiFile(type=0)
+        this.muzykaTrack = MidiTrack()
+        this.wokalTrack = MidiTrack()
+
+        this.muzyka.tracks.append(this.muzykaTrack)
+        this.wokal.tracks.append(this.wokalTrack)
+
+        this.muzykaTrack.append(MetaMessage('set_tempo', tempo=bpm2tempo(this.tempo)))
+        this.wokalTrack.append(MetaMessage('set_tempo', tempo=bpm2tempo(this.tempo)))
+
         #tworzenie zestawu instrumentów używanych w piosence
-        this.instruments=Instrumenty(this.MyMIDI, instruments)
+        this.instruments=Instrumenty(this.muzykaTrack, instruments)
         #70% szans na pojawienie się perkusji w utworze
         if random.random()<0.7:
             this.perkusja= Drums(metrum, drums)
         else:
             this.perkusja=None
-        this.MyMIDI.addTempo(this.track, this.time, tempo)
 
     def generatePiece(this):
         note = Dzwiek(list(this.skala.gama)[random.randint(0, 6)], random.randint(3, 5)) # losujemy początek ze skali
@@ -579,17 +587,39 @@ class Piece:
                 this._appendToMidi(solo, dlugoscSolo*this.metrum)
         this._appendToMidi(outro, dlugoscOutro*this.metrum)
         #zapisywanie wygenerowanej muzyki
-        with open("muzyka.mid", "wb") as output_file:
-            this.MyMIDI.writeFile(output_file)
-        with open("wokal.mid", "wb") as output_file:
-            this.vocalMIDI.writeFile(output_file)
+        this.muzyka.save('muzyka.mid')
+        this.wokal.save('wokal.mid')
 
 
     def _appendToMidi(this, piece, pieceDuration):
+        muzykaEvents = list()
+        wokalEvents = list()
+        relative = 0
         for sound in piece[0]:
-            this.MyMIDI.addNote(0,sound.channel, sound.note, sound.relTime+this.time, sound.duration, sound.volume)
+            muzykaEvents.append(['on', sound.note, sound.channel, sound.volume, sound.relTime])
+            muzykaEvents.append(['off', sound.note, sound.channel, sound.volume, sound.relTime+sound.duration])
+            muzykaEvents.sort(key=lambda x: x[4])
+        for event in muzykaEvents:
+            if event[0] == 'on':
+                this.muzykaTrack.append(
+                     Message('note_on', note=event[1], channel=event[2], velocity=event[3], time=int((event[4]-relative)*480)))
+            else:
+                this.muzykaTrack.append(
+                     Message('note_off', note=event[1], channel=event[2], velocity=event[3], time=int((event[4]-relative)*480)))
+            relative = event[4]
+        relative = 0
         for sound in piece[1]:
-            this.vocalMIDI.addNote(0, sound.channel, sound.note, sound.relTime + this.time, sound.duration, sound.volume)
+            wokalEvents.append(['on', sound.note, sound.channel, sound.volume, sound.relTime])
+            wokalEvents.append(['off', sound.note, sound.channel, sound.volume, sound.relTime + sound.duration])
+            wokalEvents.sort(key=lambda x: x[4])
+        for event in wokalEvents:
+            if event[0] == 'on':
+                this.wokalTrack.append(
+                     Message('note_on', note=event[1], channel=event[2], velocity=event[3], time=int((event[4]-relative)*480)))
+            else:
+                this.wokalTrack.append(
+                     Message('note_off', note=event[1], channel=event[2], velocity=event[3], time=int((event[4]-relative)*480)))
+            relative = event[4]
         this.time+=pieceDuration
 
     def generateIntro(this, nOfMeasures, note, metrum, skala, instruments, perkusja):
@@ -692,7 +722,7 @@ class Piece:
                 for x in akord.chord:
                     piece.append(Sound(relative_time, instruments.getAccompaniment(), x.toMidi(), metrum, 90))
                 # uwydatnianie akcentu głośnością
-                volume = 140
+                volume = 120
             else:
                 volume = 100
 

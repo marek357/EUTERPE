@@ -1,6 +1,7 @@
 from midiutil import MIDIFile
 import random
 import copy
+from mido import Message, MidiFile, MidiTrack
 
 #oznaczenia rodzajów dźwięków w programie
 C=0
