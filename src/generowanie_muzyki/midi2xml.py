@@ -39,7 +39,7 @@ def midi2xml(lyrics,midiPath,xmlPath,tempo):
 	os.remove(tempXML)
 
 def createMusicXML(midiPath, new_musicxml_path):
-    os.system("export QT_QPA_PLATFORM=cocoa && mscore "+ midiPath +" -o " + new_musicxml_path)
+    os.system("export QT_QPA_PLATFORM=offscreen && musescore "+ midiPath +" -o " + new_musicxml_path)
 
 def generateVoiceSpecification(lyrics,tempo,inputMusicXMLPath,outputMusicXMLPath):
 	with open(inputMusicXMLPath, 'r') as c:
