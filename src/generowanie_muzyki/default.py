@@ -517,7 +517,7 @@ class Drums:
                 this.bit.append(Sound(2,9,this.third,1,100))
 
 class Piece:
-    def __init__(this, metrum, skala, tempo, instruments=list(range(1,112+1)), drums=list(range(35, 81+1))):
+    def __init__(this, metrum, skala, tempo, gatunek, instruments=list(range(1,112+1)), drums=list(range(35, 81+1))):
         this.track= 0
         this.time= 0   # In beats
         this.skala=skala
@@ -527,6 +527,7 @@ class Piece:
         this.wokal = MidiFile(type=0)
         this.muzykaTrack = MidiTrack()
         this.wokalTrack = MidiTrack()
+        this.gatunek = gatunek
 
         this.muzyka.tracks.append(this.muzykaTrack)
         this.wokal.tracks.append(this.wokalTrack)
@@ -551,49 +552,50 @@ class Piece:
         powtorzeniaRefrenu = random.randint(1, 2)
         zwrotkaSolo = random.randint(-1, liczbaZwrotek-1)
 
-        dlugoscIntro=random.randint(4, 6)
-        dlugoscZwrotka=random.randint(8, 16)
-        dlugoscRefren=random.randint(6, 12)
-        dlugoscSolo=random.randint(8, 16)
-        dlugoscOutro=random.randint(4, 8)
+        dlugoscIntro=random.choice([4, 6])
+        dlugoscZwrotka=random.choice([8, 10, 12, 14, 16])
+        dlugoscRefren=random.choice([6, 8, 10, 12])
+        dlugoscSolo=random.choice([8, 10, 12, 14, 16])
+        dlugoscOutro=random.choice([4, 6, 8])
         intro = this.generateIntro(dlugoscIntro, note, this.metrum, this.skala, this.instruments, this.perkusja)
         zwrotka = this.generateVerse(dlugoscZwrotka, note, this.metrum, this.skala, this.instruments, this.perkusja)
         refren = this.generateChorus(dlugoscRefren, note, this.metrum, this.skala, this.instruments, this.perkusja)
         solo = this.generateSolo(dlugoscSolo, note, this.metrum, this.skala, this.instruments, this.perkusja)
         outro = this.generateOutro(dlugoscOutro, note, this.metrum, this.skala, this.instruments, this.perkusja)
 
-        #debug
-        print()
-        print("Liczba zwrotek " + str(liczbaZwrotek))
-        print("Powtórzenia refrenu " + str(powtorzeniaRefrenu))
-        print("Zwrotka po której następuje solo " + str(zwrotkaSolo + 1))
-        print("\nInstrumenty:")
-        print("main "+str(this.instruments.main))
-        print("accompaniment "+str(this.instruments.accompaniment))
-        print("second "+str(this.instruments.second))
-        print("solo "+str(this.instruments.solo))
-        print("\nPerkusja:")
-        if this.perkusja is None:
-            print("brak")
-        else:
-            print("first "+str(this.perkusja.first))
-            print("second "+str(this.perkusja.second))
-            print("third "+str(this.perkusja.third))
-    
-        this._appendToMidi(intro, dlugoscIntro*this.metrum)
+        infoTekst = open("infoTekst.txt", "w")
+        infoWokal = open("wokalTekst.txt", "w")
+
+        infoTekst.write((str(this.gatunek)))
+        infoTekst.write('\n')
+        infoTekst.write((str(liczbaZwrotek)))
+        infoTekst.write('\n')
+        infoTekst.write((str(powtorzeniaRefrenu)))
+        infoTekst.write('\n')
+        infoTekst.write(str((int(dlugoscZwrotka/2))))
+        infoTekst.write('\n')
+        infoTekst.write(str((int(dlugoscRefren/2))))
+        infoTekst.write('\n')
+        infoWokal.write((str(this.tempo)))
+
+        globalTime = 0
+        this._appendToMidi(intro, dlugoscIntro*this.metrum, globalTime)
+        globalTime = this.metrum * dlugoscIntro
         for i in range(liczbaZwrotek):
-            this._appendToMidi(zwrotka, dlugoscZwrotka*this.metrum)
+            this._appendToMidi(zwrotka, dlugoscZwrotka*this.metrum, globalTime)
+            globalTime = 0
             for j in range(powtorzeniaRefrenu):
-                this._appendToMidi(refren, dlugoscRefren*this.metrum)
+                this._appendToMidi(refren, dlugoscRefren*this.metrum, globalTime)
             if zwrotkaSolo == i:
-                this._appendToMidi(solo, dlugoscSolo*this.metrum)
-        this._appendToMidi(outro, dlugoscOutro*this.metrum)
+                this._appendToMidi(solo, dlugoscSolo*this.metrum, globalTime)
+                globalTime = this.metrum * dlugoscSolo
+        this._appendToMidi(outro, dlugoscOutro*this.metrum, globalTime)
         #zapisywanie wygenerowanej muzyki
         this.muzyka.save('muzyka.mid')
         this.wokal.save('wokal.mid')
 
 
-    def _appendToMidi(this, piece, pieceDuration):
+    def _appendToMidi(this, piece, pieceDuration, globalTime):
         muzykaEvents = list()
         wokalEvents = list()
         relative = 0
@@ -611,8 +613,8 @@ class Piece:
             relative = event[4]
         relative = 0
         for sound in piece[1]:
-            wokalEvents.append(['on', sound.note, sound.channel, sound.volume, sound.relTime])
-            wokalEvents.append(['off', sound.note, sound.channel, sound.volume, sound.relTime + sound.duration])
+            wokalEvents.append(['on', sound.note, sound.channel, sound.volume, sound.relTime + globalTime])
+            wokalEvents.append(['off', sound.note, sound.channel, sound.volume, sound.relTime + sound.duration + globalTime])
             wokalEvents.sort(key=lambda x: x[4])
         for event in wokalEvents:
             if event[0] == 'on':

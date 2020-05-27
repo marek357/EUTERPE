@@ -298,5 +298,5 @@ if __name__=="__main__":
     else:
         from default import Piece
 
-    muzyka=Piece(metrum,skala,tempo)
+    muzyka=Piece(metrum,skala,tempo, gatunek)
     muzyka.generatePiece()
