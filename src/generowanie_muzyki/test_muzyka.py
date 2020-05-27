@@ -65,13 +65,4 @@ class TestAkord:
 #sprawdzanie istnienia pliku po dokonaniu generacji muzyki
 class TestPlik:
     def test_czy_plik_istnieje(this):
-        for _ in range(1000):
-            metrum = random.randint(2, 4)
-            tempo = random.randint(70, 120)
-            tonacja = random.randint(0, 11)
-            rodzajSkali = random.choice([Dur, Mol, Blues])
-            skala = Skala(tonacja, rodzajSkali)
-            muzyka = Piece(metrum, skala, tempo)
-            muzyka.generatePiece()
-            assert path.exists('muzyka.mid')
-            os.remove('muzyka.mid')
+        assert path.exists('muzyka.mid')

@@ -1,5 +1,6 @@
 import random
 import copy
+from mido import Message, MidiFile, MidiTrack
 
 #oznaczenia rodzajów dźwięków w programie
 C = 0
@@ -293,14 +294,14 @@ if __name__ == "__main__":
             from jazz import PieceJazz as Piece
         elif gatunek == Indie:
             from indie import PieceIndie as Piece
-        elif gatunek == Electronic:
+        elif gatunek==Electronic:
             from electronic import PieceElectronic as Piece
-        elif gatunek == Pop:
+        elif gatunek==Pop:
             from pop import PiecePop as Piece
         elif gatunek == Hip_Hop:
             from hip_hop import PieceHipHop as Piece
     else:
         from default import Piece
 
-    muzyka = Piece(metrum, skala, tempo)
+    muzyka=Piece(metrum,skala,tempo, gatunek)
     muzyka.generatePiece()
