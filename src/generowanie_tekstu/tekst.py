@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
 #    model = load_ngram('Rap')
 #    print(generate_text(model,500))
-    song = dressing('Pop', liczbaZwrotek, liczbaWersowZwrotki, liczbaWersowRefrenu, powtorzeniaRefrenu, avr_slow_w_wersie = 4)
+    song = dressing('Country', liczbaZwrotek, liczbaWersowZwrotki, liczbaWersowRefrenu, powtorzeniaRefrenu, avr_slow_w_wersie = 4)
     print(song)
     save(song,'xd')
 #    song = read('xd')
