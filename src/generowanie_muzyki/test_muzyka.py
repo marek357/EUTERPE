@@ -71,7 +71,7 @@ class TestPlik:
             tonacja = random.randint(0, 11)
             rodzajSkali = random.choice([Dur, Mol, Blues])
             skala = Skala(tonacja, rodzajSkali)
-            muzyka = Piece(metrum, skala, tempo)
+            muzyka = Piece(metrum, skala, tempo,1) #ostatni parametr gatunku nic nie zmienia, ale musi być
             muzyka.generatePiece()
             assert path.exists('muzyka.mid')
             os.remove('muzyka.mid')
