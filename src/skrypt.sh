@@ -14,7 +14,7 @@ echo "Wygenerowano muzykę"
 
 cd generowanie_tekstu
 
-python3 tekst.py < ../infoTekst.txt
+python3 tekst.py < ../generowanie_muzyki/infoTekst.txt
 
 cd ..
 

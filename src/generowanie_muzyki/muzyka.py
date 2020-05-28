@@ -269,6 +269,7 @@ if __name__ == "__main__":
     rodzajSkali = scaleToInt(rodzajSkali)
     skala = Skala(tonacja, rodzajSkali)
     #gatunek
+    gatunek = 4
     if parametry == 'T':
         gatunek = input('''Wprowadź gatunek (dostępne Metal, Country, R&B, Folk, 
         Rock, Jazz, Indie, Electronic, Pop, Hip-Hop lub R (domyślne losowanie)''')
