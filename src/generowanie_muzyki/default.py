@@ -1,6 +1,7 @@
 ﻿import random
 import copy
 from mido import Message, MetaMessage, MidiFile, MidiTrack, bpm2tempo
+from muzyka import Skala
 
 #oznaczenia rodzajów dźwięków w programie
 C = 0

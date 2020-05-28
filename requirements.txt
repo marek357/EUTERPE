@@ -1,7 +1,9 @@
+requests
+music21
+Pyphen
+pydub
 nltk
 scikit-learn
-keras
 numpy
-pandas
 mido
 pytest
