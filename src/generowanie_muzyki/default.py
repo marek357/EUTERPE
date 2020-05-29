@@ -174,10 +174,10 @@ class Dzwiek:
 
     #kontrola zbyt wysokich/niskich dzwiekow
     def normalize(self):
-        if self.oktawa <= 3:
-            self.oktawa = 3
-        if self.oktawa >= 5:
-            self.oktawa = 5
+        if self.oktawa <= 2:
+            self.oktawa = 2
+        if self.oktawa >= 4:
+            self.oktawa = 4
 
 
 
@@ -553,7 +553,7 @@ class Piece:
 
     def generatePiece(this):
         # losujemy początek ze skali
-        note = Dzwiek(list(this.skala.gama)[random.randint(0, 6)], random.randint(3, 5))
+        note = Dzwiek(list(this.skala.gama)[random.randint(0, 6)], random.randint(2, 4))
 
         liczbaZwrotek = random.randint(1, 3)
         powtorzeniaRefrenu = random.randint(1, 2)
