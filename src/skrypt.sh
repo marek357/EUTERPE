@@ -1,8 +1,12 @@
 #!/bin/bash
 
-#skrypt można uruchomić po wygenerowaniu muzyki za pomocą skryptu muzyka.py oraz tekstu za pomocą skryptu tekst.py
+if [ -f generowanie_muzyki/muzyka.mid ] ; then
+    rm generowanie_muzyki/muzyka.mid
+fi
 
-rm generowanie_muzyki/muzyka.mid generowanie_muzyki/wokal.mid
+if [ -f generowanie_muzyki/wokal.mid ] ; then
+    rm generowanie_muzyki/wokal.mid
+fi
 
 cd generowanie_muzyki
 
