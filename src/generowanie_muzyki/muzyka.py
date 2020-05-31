@@ -22,18 +22,16 @@ Mol = 2
 Blues = 3
 
 #oznaczenia gatunków
-Other = 1
-Not_Available = 2
-Metal = 3
-Country = 4
-R_B = 5
-Folk = 6
-Rock = 7
+Metal = 0
+R_B = 1
+Folk = 2
+Hip_Hop = 3
+Pop = 4
+Rock = 5
+Indie = 6
+Country = 7
 Jazz = 8
-Indie = 9
-Electronic = 10
-Pop = 11
-Hip_Hop = 12
+Electronic = 9
 
 #funkcje generujące skale
 
@@ -87,8 +85,6 @@ class Skala:
         this.gama = generateScale(key, type)
 
 #dostępne gatunki jako listy instrumentów
-OtherInstrumenty = list(range(1, 112 + 1))
-Not_AvailableInstrumenty = list(range(1, 112 + 1))
 MetalInstrumenty = [31, 32, 34, 35]
 CountryInstrumenty = [4, 21, 26, 41, 42, 106]
 R_BInstrumenty = [8, 33, 34, 84, 89]
@@ -100,9 +96,6 @@ ElectronicInstrumenty = [5, 6, 39, 40, 45, 51, 52, 55, 63, 64, 81, 82]
 PopInstrumenty = [5, 6, 26, 28, 29, 33, 49, 50, 81, 87, 89, 90, 96, 97]
 Hip_HopInstrumenty = [33, 34, 84, 98]
 
-
-OtherPerkusja = list(range(35, 81 + 1))
-Not_AvailablePerkusja = list(range(35, 81 + 1))
 MetalPerkusja = [37, 38, 40, 43, 44, 45, 46, 47, 49, 51, 57]
 CountryPerkusja = [35, 54, 58, 69]
 R_BPerkusja = [35, 36, 39, 60, 73]
@@ -157,9 +150,7 @@ def scaleToInt(scale):
 
 #konwersja slowa oznaczającego gatunek na int
 def genreToInt(genre):
-    res = Other
-    if genre == 'Other':
-        res = Other
+    res = Pop
     if genre == 'Metal':
         res = Metal
     if genre == 'Country':
@@ -186,10 +177,6 @@ def genreToInt(genre):
 
 
 def getInstrumentsForGenre(gatunek):
-    if gatunek == Other:
-        return OtherInstrumenty
-    if gatunek == Not_Available:
-        return Not_AvailableInstrumenty
     if gatunek == Metal:
         return MetalInstrumenty
     if gatunek == Country:
@@ -212,10 +199,6 @@ def getInstrumentsForGenre(gatunek):
         return Hip_HopInstrumenty
 
 def getDrumsForGenre(gatunek):
-    if gatunek == Other:
-        return OtherPerkusja
-    if gatunek == Not_Available:
-        return Not_AvailablePerkusja
     if gatunek == Metal:
         return MetalPerkusja
     if gatunek == Country:
@@ -269,7 +252,7 @@ if __name__ == "__main__":
     rodzajSkali = scaleToInt(rodzajSkali)
     skala = Skala(tonacja, rodzajSkali)
     #gatunek
-    gatunek = 4
+    gatunek = random.randint(0, 9)
     if parametry == 'T':
         gatunek = input('''Wprowadź gatunek (dostępne Metal, Country, R&B, Folk, 
         Rock, Jazz, Indie, Electronic, Pop, Hip-Hop lub R (domyślne losowanie)''')
@@ -277,7 +260,7 @@ if __name__ == "__main__":
     if parametry == 'T':
         #losowanie gatunku
         if gatunek == 'R':
-            gatunek = random.randint(3, 12)
+            gatunek = random.randint(0, 9)
         else:
             gatunek = genreToInt(gatunek)
         #importowanie wybranego gatunku

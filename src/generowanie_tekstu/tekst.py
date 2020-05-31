@@ -94,10 +94,10 @@ def read(name):
     
 if __name__ == '__main__':
 
-    Genres = ['Metal', 'Soul', 'Punk', 'Folk','Rap', 'Hip_Hop', 'Pop','Rock', 'Indie', 'Country', 'Blues']
+    Genres = ['Metal', 'Soul', 'Folk', 'Hip_Hop', 'Pop','Rock', 'Indie', 'Country', 'Blues']
  
     gatunek = int(input())
-    gatunek = Genres[gatunek-3]
+    gatunek = Genres[gatunek]
     
     liczbaZwrotek = int(input())
     powtorzeniaRefrenu = int(input())
