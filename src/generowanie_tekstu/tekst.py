@@ -97,7 +97,11 @@ if __name__ == '__main__':
     Genres = ['Metal', 'Soul', 'Folk', 'Hip_Hop', 'Pop','Rock', 'Indie', 'Country', 'Blues']
  
     gatunek = int(input())
-    gatunek = Genres[gatunek]
+
+    if gatunek < 0 or gatunek > 8:
+        gatunek = 'Pop'
+    else:
+        gatunek = Genres[gatunek]
     
     liczbaZwrotek = int(input())
     powtorzeniaRefrenu = int(input())
