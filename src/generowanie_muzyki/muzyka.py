@@ -222,7 +222,7 @@ def getDrumsForGenre(gatunek):
 
 if __name__ == "__main__":
     #losowanie głównych parametrów utworu
-    parametry = input('Czy chcesz wybrać parametry utworu (T/N)')
+    parametry = input('Wprowadź gatunek')
     #tempo
     tempo = random.randint(70, 120)
     #metrum, podstawą jest zawsze ćwierćnuta (np.  po wylosowaniu 3 metrum to
@@ -234,39 +234,31 @@ if __name__ == "__main__":
     skala = Skala(tonacja, rodzajSkali)
     #gatunek
     gatunek = random.randint(0, 9)
-    if parametry == 'T':
-        gatunek = input('''Wprowadź gatunek (dostępne Metal, Country, R&B, Folk, 
-        Rock, Jazz, Indie, Electronic, Pop, Hip-Hop lub R (domyślne losowanie)''')
-          
-    if parametry == 'T':
-        #losowanie gatunku
-        if gatunek == 'R':
-            gatunek = random.randint(0, 9)
-        else:
-            gatunek = genreToInt(gatunek)
-        #importowanie wybranego gatunku
-        if gatunek == Metal:
-            from metal import PieceMetal as Piece
-        elif gatunek == Country:
-            from country import PieceCountry as Piece
-        elif gatunek == R_B:
-            from R_B import PieceRB as Piece
-        elif gatunek == Folk:
-            from folk import PieceFolk as Piece
-        elif gatunek == Rock:
-            from rock import PieceRock as Piece
-        elif gatunek == Jazz:
-            from jazz import PieceJazz as Piece
-        elif gatunek == Indie:
-            from indie import PieceIndie as Piece
-        elif gatunek==Electronic:
-            from electronic import PieceElectronic as Piece
-        elif gatunek==Pop:
-            from pop import PiecePop as Piece
-        elif gatunek == Hip_Hop:
-            from hip_hop import PieceHipHop as Piece
-    else:
-        from default import Piece
+
+    if parametry != 'R':
+        gatunek = genreToInt(parametry)
+
+    #importowanie wybranego gatunku
+    if gatunek == Metal:
+        from metal import PieceMetal as Piece
+    elif gatunek == Country:
+        from country import PieceCountry as Piece
+    elif gatunek == R_B:
+        from R_B import PieceRB as Piece
+    elif gatunek == Folk:
+        from folk import PieceFolk as Piece
+    elif gatunek == Rock:
+        from rock import PieceRock as Piece
+    elif gatunek == Jazz:
+        from jazz import PieceJazz as Piece
+    elif gatunek == Indie:
+        from indie import PieceIndie as Piece
+    elif gatunek==Electronic:
+        from electronic import PieceElectronic as Piece
+    elif gatunek==Pop:
+        from pop import PiecePop as Piece
+    elif gatunek == Hip_Hop:
+        from hip_hop import PieceHipHop as Piece
 
     muzyka=Piece(metrum,skala,tempo, gatunek)
     muzyka.generatePiece()

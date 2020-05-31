@@ -10,12 +10,7 @@ fi
 
 cd generowanie_muzyki
 
-argumenty="T"
-argumenty+=$'\n'
-argumenty+="$1"
-
-echo "$argumenty"
-python3 muzyka.py <<< "$argumenty"
+python3 muzyka.py <<< $1
 
 cd ..
 
