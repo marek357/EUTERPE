@@ -6,7 +6,7 @@ Założenia, jakie nam przyświecają przy tworzeniu tego projektu to wytworzeni
 # Jak z niego korzystać
 
 Żeby skrypt mógł się poprawnie uruchomić, należy zainstalować pythonowe modułu z pliki requirements.txt
-oraz platformę FFmepg. 
+oraz pakiety FFmepg, musescore i timidity. 
 
 Aby wypróbować system tworzenia piosenki razem z wokalem należy uruchomić skrypt.sh w katalogu src.
 Wygenerowana piosenka będzie w pełni losowa. W celu skorzystania z szerokiego wachlarza opcji przy generacji utworu należy skorzystać z z poniższych skryptów osobno, a następnie wykonać analogiczne komendy jak w skrypt.sh. 
