@@ -224,32 +224,13 @@ if __name__ == "__main__":
     #losowanie głównych parametrów utworu
     parametry = input('Czy chcesz wybrać parametry utworu (T/N)')
     #tempo
-    if parametry == 'T':
-        tempo = input('Wprowadź tempo od 70 do 120 lub R (domyślne losowanie)')
-        if tempo != 'R':
-            tempo = int(tempo)
-    if parametry == 'N' or tempo == 'R':
-        tempo = random.randint(70, 120)
+    tempo = random.randint(70, 120)
     #metrum, podstawą jest zawsze ćwierćnuta (np.  po wylosowaniu 3 metrum to
     #3/4)
-    if parametry == 'T':
-        metrum = input('Wprowadź metrum od 2 do 4 (2/4 - 4/4) lub R (domyślne losowanie)')
-        if metrum != 'R':
-            metrum = int(metrum)
-    if parametry == 'N' or metrum == 'R':
-        metrum = random.randint(2, 4)
+    metrum = random.randint(2, 4)
     #skala
-    if parametry == 'T':
-        tonacja = input('Wprowadź tonację (np. Gis) lub R (domyślne losowanie)')
-        tonacja = keyToInt(tonacja)
-    if parametry == 'N' or tonacja == 'R':
-        tonacja = random.randint(0, 11)
-    if parametry == 'T':
-        rodzajSkali = input('Wproadź rodzaj skali (dostępne Dur, Mol, Blues) lub R (domyślne losowanie)')
-    if parametry == 'N' or rodzajSkali == 'R':
-        rodzajSkali = random.choice([Dur, Mol, Blues])
-
-    rodzajSkali = scaleToInt(rodzajSkali)
+    tonacja = random.randint(0, 11)
+    rodzajSkali = random.choice([Dur, Mol, Blues])
     skala = Skala(tonacja, rodzajSkali)
     #gatunek
     gatunek = random.randint(0, 9)
