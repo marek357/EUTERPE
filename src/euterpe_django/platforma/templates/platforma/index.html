@@ -1,0 +1,23 @@
+{% extends "platforma/base.html" %}
+{% block content %}
+    <div style="display: flex; width: 100%;">
+        <div style="flex: 1;">
+            <i class="fas fa-question icon icon-question" onclick="help()"></i>
+        </div>
+        <i class="fas fa-history icon icon-history" style="color: lightslategray" onclick="music_history()"></i>
+    </div>
+    <div class="input-style parametry">
+        <h4 class="tekst">
+            EUTERPE- muzyka, której jeszcze nie słyszałeś
+        </h4>
+        <div style="display: flex; margin-top: 3em;">
+            <select class="form-control" id="wybor-gatunku">
+                <option>R</option>
+                <option>Country</option>
+                <option>Rap</option>
+                <option>Pop</option>
+            </select>
+            <i class="fas fa-arrow-circle-right icon" onclick="generate()"></i>
+        </div>
+    </div>
+{% endblock content %}
