@@ -5,6 +5,8 @@ Założenia, jakie nam przyświecają przy tworzeniu tego projektu to wytworzeni
 
 # Jak z niego korzystać
 
+# Generowanie muzyki z poziomu terminala
+
 Żeby skrypt mógł się poprawnie uruchomić, należy zainstalować pythonowe modułu z pliki requirements.txt
 oraz pakiety FFmepg, musescore i timidity. 
 
@@ -16,6 +18,22 @@ Aby wypróbować system tworzenia muzyki wystarczy uruchomic plik EUTERPE/src/ge
 Aby wypróbować system tworzenia tekstu wystarczy uruchomić plik EUTERPE/src/generowanie_tekstu/tekst.py
 
 Skrypt generowania muzyki uruchamiamy w terminalu wpisując `python3 muzyka.py`. Zapyta się on nas następnie czy chcemy wybrać parametry utworu. Można zdać się na los lub samodzielnie dostosować opcje. Wybrać można tempo, metrum, tonację, rodzaj użytej skali muzycznej oraz gatunek utworu. Następnie skrypt wygeneruje plik z muzyką o nazwie "muzyka.mid".
+
+Skrypt generowania tekstu uruchamiamy w terminalu wpisując `python3 tekst.py gatunek_muzyki długość_tekstu_piosenki`. 
+
+# Generowanie muzyki z poziomu przeglądarki
+
+W EUTERPE/src/euterpe_django należy przy pierwszym uruchomieniu wykonać wszystkie oczekujące migracje poleceniem:
+
+  `python3 manage.py makemigrations`
+  
+  `python3 manage.py migrate`
+
+Następnie należy uruchomić deweloperski serwer poleceniem:
+
+  `python3 manage.py runserver`
+  
+Wtedy uzyskujemy dostęp do strony `127.0.0.1:8000` w przeglądarce, gdzie znajdziemy platformę.
 
 Skrypt generowania tekstu uruchamiamy w terminalu wpisując `python3 tekst.py gatunek_muzyki długość_tekstu_piosenki`. 
 Aby skorzystać z wszystkich dostępnych gatunków muzyki, należy w katalogu EUTERPE/src/generowanie_tekstu/ zapisać pliki json, które są dostępne pod linkiem:
