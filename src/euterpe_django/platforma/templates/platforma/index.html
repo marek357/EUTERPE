@@ -17,7 +17,7 @@
                 <option>Rap</option>
                 <option>Pop</option>
             </select>
-            <i class="fas fa-arrow-circle-right icon" onclick="generate()"></i>
+            <i class="fas fa-arrow-circle-right icon" onclick="generate('{{ csrf_token }}')"></i>
         </div>
     </div>
 {% endblock content %}

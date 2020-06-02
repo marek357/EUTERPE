@@ -20,7 +20,7 @@ function help() {
             "</div>"
     });
 }
-function generate() {
+function generate(csrf_token) {
     Swal.fire({
         icon: 'info',
         title: 'Utwór w trakcie generowania',
@@ -35,7 +35,7 @@ function generate() {
         dataType: "json",
         data: {
             genre: $("#wybor-gatunku").val(),
-            csrfmiddlewaretoken: $.cookie("csrftoken")
+            csrfmiddlewaretoken: csrf_token
         },
         success: function(data) {
             Swal.fire({

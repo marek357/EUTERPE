@@ -32,6 +32,7 @@ def lista(request):
 
 def endpoint(request):
     genre = request.POST.get('genre', 'null')
+    print('przyjalem gatunek: ', genre)
     if genre != 'null':
         generate_music(genre)
     return HttpResponse(json.dumps({
