@@ -1,0 +1,36 @@
+.input-style {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.icon {
+  font-size: 1.6em;
+  margin-top: 0.2em;
+  margin-left: 0.5em;
+  color: lightslategray;
+  cursor: pointer;
+}
+.icon-question {
+  margin-top: 0.5em;
+  font-size: 2.5em;
+}
+.icon-history {
+  margin-top: 0.5em;
+  font-size: 2.5em;
+  margin-right: 0.5em;
+}
+.opis {
+  width: 70% !important;
+}
+.parametry {
+  display: flex;
+  flex-direction: column;
+}
+.tekst {
+  margin-top: 1em;
+  color: lightslategray;
+  font-family: 'Playfair Display', serif;
+}

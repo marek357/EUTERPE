@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+    <link href="{% static 'platforma/style.css' %}" rel="stylesheet" type="text/css" media="all">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Exo:wght@100&family=Playfair+Display&display=swap" rel="stylesheet">
+    {% load static %}
+    <script src="{% static 'platforma/jquery.cookie.js' %}"></script>
+    {% load static %}
+    <script src="{% static 'platforma/scripts.js' %}"></script>
+
+</head>
+<body>
+
+    {% if error %}
+    <script type="text/javascript">
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: '{{error}}',
+          footer: 'Jeżeli problem wystąpi ponownie, prosimy o kontakt z administratorami'
+        })
+    </script>
+    {% endif %}
+    {% if success %}
+    <script type="text/javascript">
+         Swal.fire({
+          type: 'success',
+          title: 'Gratulacje',
+          showConfirmButton: false,
+          position: 'top-end',
+          timer: 1000,
+          text: '{{success}}'
+        })
+    </script>
+    {% endif %}
+    {% if info %}
+    <script type="text/javascript">
+         Swal.fire({
+          type: 'info',
+          showConfirmButton: false,
+          position: 'top-end',
+          timer: 1000,
+          text: '{{info}}'
+        })
+    </script>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    </div>
+</body>
+</html>
+
+
