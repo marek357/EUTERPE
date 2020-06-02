@@ -15,7 +15,7 @@ def generate_music(genre):
     os.system('./skrypt.sh {}'.format(genre))
     polecenie = 'mv piece.wav {}/{}.wav'.format(settings.MEDIA_ROOT,
                                                 '{0}-{1}'.format(genre, str(
-                                                    datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")))
+                                                    datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")))
                                                 )
     os.system(polecenie)
     os.chdir('euterpe_django')
