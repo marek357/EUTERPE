@@ -10,5 +10,5 @@ pytest
 django-ipware==2.1.0
 django-simple-email-confirmation==0.60
 django-smtp-ssl==1.0
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 django>=2.2.10
